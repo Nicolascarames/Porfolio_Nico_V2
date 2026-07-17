@@ -4,6 +4,7 @@ import { Hero } from '../components/Hero';
 import { DeviceShowcase } from '../components/DeviceShowcase';
 import { ProjectsCarousel } from '../components/ProjectsCarousel';
 import { TechMarquee } from '../components/TechMarquee';
+import { About } from '../components/About';
 
 export function HomePage() {
   return (
@@ -19,7 +20,8 @@ export function HomePage() {
         <DeviceShowcase />
         <ProjectsCarousel />
         <TechMarquee />
-        {/* About/ContactForm/... se añaden en tareas siguientes */}
+        <About />
+        {/* ContactForm/Footer se añaden en tareas siguientes */}
       </div>
     </div>
   );
