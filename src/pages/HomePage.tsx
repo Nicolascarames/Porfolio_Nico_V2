@@ -2,6 +2,7 @@ import bgImg from '../assets/hero-bg.png?w=1600&format=webp';
 import { Nav } from '../components/Nav';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase } from '../components/DeviceShowcase';
+import { ProjectsCarousel } from '../components/ProjectsCarousel';
 
 export function HomePage() {
   return (
@@ -15,7 +16,8 @@ export function HomePage() {
         <Nav />
         <Hero />
         <DeviceShowcase />
-        {/* ProjectsCarousel/TechMarquee/... se añaden en tareas siguientes */}
+        <ProjectsCarousel />
+        {/* TechMarquee/About/... se añaden en tareas siguientes */}
       </div>
     </div>
   );

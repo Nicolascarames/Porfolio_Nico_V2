@@ -25,3 +25,12 @@ body {
 a { color: var(--color-accent); text-decoration: none; }
 a:hover { color: #ffffff; }
 input::placeholder, textarea::placeholder { color: #6b6b66; }
+
+@keyframes marqL { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes marqR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+.marquee-track:hover { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
