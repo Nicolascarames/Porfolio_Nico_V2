@@ -1,6 +1,7 @@
 import bgImg from '../assets/hero-bg.png?w=1600&format=webp';
 import { Nav } from '../components/Nav';
 import { Hero } from '../components/Hero';
+import { DeviceShowcase } from '../components/DeviceShowcase';
 
 export function HomePage() {
   return (
@@ -13,7 +14,8 @@ export function HomePage() {
       <div className="relative z-10">
         <Nav />
         <Hero />
-        {/* DeviceShowcase/ProjectsCarousel/... se añaden en tareas siguientes */}
+        <DeviceShowcase />
+        {/* ProjectsCarousel/TechMarquee/... se añaden en tareas siguientes */}
       </div>
     </div>
   );
