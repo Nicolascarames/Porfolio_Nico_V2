@@ -5,6 +5,7 @@ import { DeviceShowcase } from '../components/DeviceShowcase';
 import { ProjectsCarousel } from '../components/ProjectsCarousel';
 import { TechMarquee } from '../components/TechMarquee';
 import { About } from '../components/About';
+import { ContactForm } from '../components/ContactForm';
 
 export function HomePage() {
   return (
@@ -21,7 +22,8 @@ export function HomePage() {
         <ProjectsCarousel />
         <TechMarquee />
         <About />
-        {/* ContactForm/Footer se añaden en tareas siguientes */}
+        <ContactForm />
+        {/* Footer se añade en la tarea siguiente */}
       </div>
     </div>
   );
