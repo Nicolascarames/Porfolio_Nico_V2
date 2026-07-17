@@ -3,6 +3,7 @@ import { Nav } from '../components/Nav';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase } from '../components/DeviceShowcase';
 import { ProjectsCarousel } from '../components/ProjectsCarousel';
+import { TechMarquee } from '../components/TechMarquee';
 
 export function HomePage() {
   return (
@@ -17,7 +18,8 @@ export function HomePage() {
         <Hero />
         <DeviceShowcase />
         <ProjectsCarousel />
-        {/* TechMarquee/About/... se añaden en tareas siguientes */}
+        <TechMarquee />
+        {/* About/ContactForm/... se añaden en tareas siguientes */}
       </div>
     </div>
   );
