@@ -6,6 +6,7 @@ import { ProjectsCarousel } from '../components/ProjectsCarousel';
 import { TechMarquee } from '../components/TechMarquee';
 import { About } from '../components/About';
 import { ContactForm } from '../components/ContactForm';
+import { Footer } from '../components/Footer';
 
 export function HomePage() {
   return (
@@ -23,7 +24,7 @@ export function HomePage() {
         <TechMarquee />
         <About />
         <ContactForm />
-        {/* Footer se añade en la tarea siguiente */}
+        <Footer />
       </div>
     </div>
   );
