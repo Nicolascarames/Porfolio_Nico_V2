@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  a { color: #f2efcf; text-decoration: none; }
+  a:hover { color: #ffffff; }
+  input::placeholder { color: #6b6b66; }
+  input:focus { outline: none; border-color: #f2efcf !important; }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0a0a0a; color: #f4f3ee; font-family: 'Manrope', sans-serif; display: flex; flex-direction: column; position: relative;">
+  <div style="position: fixed; inset: 0; z-index: 0; background-image: url('uploads/pasted-1784192346008-0.png'); background-size: cover; background-position: center; opacity: 0.32; pointer-events: none;"></div>
+  <div style="position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse at center, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.75) 100%); pointer-events: none;"></div>
+  <header style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 26px clamp(20px, 5vw, 56px);">
+    <a href="Portfolio.dc.html" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.02em; color: #f4f3ee;">Nico</a>
+    <a href="Portfolio.dc.html" style="font-size: 14px; color: #9a9a92;">← Volver</a>
+  </header>
+
+  <div style="position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 20px 72px;">
+    <div style="width: 100%; max-width: 420px;">
+      <div style="text-align: center; margin-bottom: 34px;">
+        <h1 style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(28px, 5vw, 34px); letter-spacing: -0.03em; margin: 0 0 10px;">Bienvenido de nuevo</h1>
+        <p style="margin: 0; color: #9a9a92; font-size: 15px;">Inicia sesión para entrar a tu espacio.</p>
+      </div>
+
+      <form onSubmit="{{ onSubmit }}" style="background: rgba(16,16,16,0.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; padding: 30px; display: flex; flex-direction: column; gap: 18px;">
+        <label style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; font-weight: 600; color: #c9c9c1;">
+          Email
+          <input type="email" placeholder="tucorreo@ejemplo.com" style="background: #0a0a0a; border: 1px solid #262624; border-radius: 12px; padding: 14px 16px; color: #f4f3ee; font-family: 'Manrope', sans-serif; font-size: 15px; transition: border-color .2s;">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; font-weight: 600; color: #c9c9c1;">
+          Contraseña
+          <input type="password" placeholder="••••••••" style="background: #0a0a0a; border: 1px solid #262624; border-radius: 12px; padding: 14px 16px; color: #f4f3ee; font-family: 'Manrope', sans-serif; font-size: 15px; transition: border-color .2s;">
+        </label>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+          <label style="display: flex; align-items: center; gap: 8px; color: #9a9a92; cursor: pointer;">
+            <input type="checkbox" style="accent-color: #f2efcf; width: 15px; height: 15px;">
+            Recuérdame
+          </label>
+          <a href="#" style="font-size: 13px;">¿Olvidaste la contraseña?</a>
+        </div>
+        <button type="submit" style="margin-top: 4px; background: #f2efcf; color: #0a0a0a; border: none; border-radius: 12px; padding: 15px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; transition: transform .15s, background .2s;" style-hover="background: #ffffff; transform: translateY(-1px);">Iniciar sesión</button>
+      </form>
+
+      <p style="text-align: center; margin: 24px 0 0; color: #9a9a92; font-size: 14px;">¿No tienes cuenta? <a href="#" style="font-weight: 600;">Crear una cuenta</a></p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      onSubmit: (e) => { e.preventDefault(); }
+    };
+  }
+}
+</script>
+</body>
+</html>
