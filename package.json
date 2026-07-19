@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "device-frame": "file:../Iphone_Clone",
+    "device-frame": "github:Nicolascarames/Iphone_Clone#49c9908",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.4",
