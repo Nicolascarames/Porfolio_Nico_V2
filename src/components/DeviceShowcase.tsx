@@ -8,10 +8,12 @@ export function DeviceShowcase() {
 
   return (
     <section className="flex justify-center py-12 sm:py-20">
-      <div className="w-full max-w-[640px] px-5">
+      <div className={isMobile ? 'w-[95vw]' : 'w-[85vw] max-w-[1800px]'}>
         <DeviceFrame
           mode="inline"
           device={isMobile ? 'phone' : 'tablet'}
+          size="l"
+          scale={2.5}
           contentUrl={CONTENT_URL}
           background="transparent"
           controls={false}
