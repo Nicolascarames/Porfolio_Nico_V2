@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../auth-kit/config/theme.css";
 
 @theme {
   --color-bg: #0a0a0a;
@@ -6,6 +7,14 @@
   --color-text: #f4f3ee;
   --font-display: "Space Grotesk", sans-serif;
   --font-body: "Manrope", sans-serif;
+
+  /* Tokens del auth-kit (Tailwind v4 los toma de aquí, no de un
+     tailwind.config.js — el kit fue diseñado contra v3, esto es la
+     traducción; valores idénticos a src/auth-kit/config/theme.css). */
+  --color-surface: #1a1a1a;
+  --color-brand-gray: #1a1a1a;
+  --color-brand: #7c5cff;
+  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 html {
@@ -24,6 +33,14 @@ body {
 
 a { color: var(--color-accent); text-decoration: none; }
 a:hover { color: #ffffff; }
+
+/* Tailwind v4 utilities live in @layer utilities, which always loses to
+   unlayered rules like the bare `a{color}` above regardless of specificity —
+   so `text-bg` on the nav's cream (accent) button gets silently overridden
+   back to accent-on-accent (invisible text) without this. */
+a.nav-cta, a.nav-cta:hover, button.nav-cta {
+  color: var(--color-bg);
+}
 input::placeholder, textarea::placeholder { color: #6b6b66; }
 
 @keyframes marqL { from { transform: translateX(0); } to { transform: translateX(-50%); } }

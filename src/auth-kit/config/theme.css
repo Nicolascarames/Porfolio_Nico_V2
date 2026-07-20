@@ -1,0 +1,9 @@
+:root {
+  --color-bg: #000000;
+  --color-surface: #1a1a1a;
+  --brand-rgb: 124 92 255;
+  --color-brand: #7c5cff;
+  --color-btn-primary-bg: #ffffff;
+  --color-btn-primary-text: #000000;
+  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}

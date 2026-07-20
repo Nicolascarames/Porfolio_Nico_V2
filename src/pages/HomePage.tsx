@@ -1,5 +1,4 @@
 import bgImg from '../assets/hero-bg.png?w=1600&format=webp';
-import { Nav } from '../components/Nav';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase } from '../components/DeviceShowcase';
 import { ProjectsCarousel } from '../components/ProjectsCarousel';
@@ -17,7 +16,6 @@ export function HomePage() {
       />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(10,10,10,0.2)_0%,rgba(10,10,10,0.75)_100%)]" />
       <div className="relative z-10">
-        <Nav />
         <Hero />
         <DeviceShowcase />
         <ProjectsCarousel />
