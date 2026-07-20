@@ -1,9 +1,22 @@
 import type { Project } from '../data/projects';
 import { projects } from '../data/projects';
 
-function ProjectCard({ title, desc, img }: Project) {
+interface ProjectCardProps {
+  project: Project;
+  onSelect: (project: Project) => void;
+  decorative?: boolean;
+}
+
+function ProjectCard({ project, onSelect, decorative }: ProjectCardProps) {
+  const { title, desc, img } = project;
   return (
-    <div className="relative aspect-[3/2] w-[clamp(300px,34vw,440px)] shrink-0 overflow-hidden rounded-[22px] border border-neutral-800">
+    <button
+      type="button"
+      tabIndex={decorative ? -1 : undefined}
+      aria-hidden={decorative || undefined}
+      onClick={() => onSelect(project)}
+      className="relative aspect-[3/2] w-[clamp(300px,34vw,440px)] shrink-0 overflow-hidden rounded-[22px] border border-neutral-800 text-left transition hover:border-neutral-600"
+    >
       <img
         src={img}
         alt={title}
@@ -16,11 +29,15 @@ function ProjectCard({ title, desc, img }: Project) {
         <h3 className="font-display text-[22px] font-semibold text-white">{title}</h3>
         <p className="mt-1.5 text-sm leading-snug text-neutral-300">{desc}</p>
       </div>
-    </div>
+    </button>
   );
 }
 
-export function ProjectsCarousel() {
+interface ProjectsCarouselProps {
+  onSelectProject: (project: Project) => void;
+}
+
+export function ProjectsCarousel({ onSelectProject }: ProjectsCarouselProps) {
   return (
     <section className="border-t border-white/5 py-16 sm:py-[90px]">
       <div className="mb-8 px-5 sm:px-[60px]">
@@ -35,12 +52,12 @@ export function ProjectsCarousel() {
         <div className="marquee-track flex w-max animate-[marqL_55s_linear_infinite]">
           <div className="flex gap-6 pr-6">
             {projects.map((p) => (
-              <ProjectCard key={p.title} {...p} />
+              <ProjectCard key={p.title} project={p} onSelect={onSelectProject} />
             ))}
           </div>
           <div className="flex gap-6 pr-6" aria-hidden="true">
             {projects.map((p) => (
-              <ProjectCard key={`${p.title}-dup`} {...p} />
+              <ProjectCard key={`${p.title}-dup`} project={p} onSelect={onSelectProject} decorative />
             ))}
           </div>
         </div>
