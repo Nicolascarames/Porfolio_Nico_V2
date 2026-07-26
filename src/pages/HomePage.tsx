@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import bgImg from '../assets/hero-bg.png?w=1600&format=webp';
+import bgImg from '../assets/fondoSicodelico.jpg?w=1600&format=webp';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase } from '../components/DeviceShowcase';
 import { ProjectsCarousel } from '../components/ProjectsCarousel';
