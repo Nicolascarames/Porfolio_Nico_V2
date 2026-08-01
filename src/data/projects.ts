@@ -6,7 +6,9 @@ import desktopNavImg from '../assets/projects/desktop-nav.png?w=800&format=webp'
 export interface Project {
   title: string;
   desc: string;
-  img: string;
+  /** Sin captura de pantalla todavía en algunos proyectos nuevos — opcional
+   * para no romper la tarjeta mientras no exista el asset real. */
+  img?: string;
   /** Id del proyecto en Desktop_Nav (src/data/projects.ts de ese repo). Si
    * está presente, el click abre el proyecto dentro de la Tablet en vez de
    * en otra pestaña. Se omite quien no tenga ventana propia allí (Desktop
@@ -37,5 +39,10 @@ export const projects: Project[] = [
     title: 'Desktop Nav',
     desc: 'Simula un escritorio en la web, con IA y flujos de trabajo integrados.',
     img: desktopNavImg,
+  },
+  {
+    title: 'CriptoFiscal',
+    desc: 'App de registro de operaciones cripto e informes fiscales para España: FIFO por activo, conversión a EUR con tipo de cambio histórico, informe de IRPF exportable a PDF.',
+    desktopNavId: 'criptofiscal',
   },
 ];

@@ -17,13 +17,17 @@ function ProjectCard({ project, onSelect, decorative }: ProjectCardProps) {
       onClick={() => onSelect(project)}
       className="relative aspect-[3/2] w-[clamp(300px,34vw,440px)] shrink-0 overflow-hidden rounded-[22px] border border-neutral-800 text-left transition hover:border-neutral-600"
     >
-      <img
-        src={img}
-        alt={title}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover object-top"
-      />
+      {img ? (
+        <img
+          src={img}
+          alt={title}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-neutral-900" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/35 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-[22px]">
         <h3 className="font-display text-[22px] font-semibold text-white">{title}</h3>
