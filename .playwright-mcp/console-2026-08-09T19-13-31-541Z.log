@@ -1,0 +1,13 @@
+[     919ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://nicolascaramesgarcia.vercel.app/login:0
+[   14793ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://placeholder.supabase.co/auth/v1/token?grant_type=password:0
+[   14793ms] [ERROR] TypeError: Failed to fetch
+    at https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:79:2957
+    at kQ (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:79:9821)
+    at W (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:79:9570)
+    at aq.signInWithPassword (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:94:21130)
+    at https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:95:57998
+    at $e (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:7795:94347)
+    at Object.UZ (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:37:9847)
+    at YZ (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:37:10001)
+    at WZ (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:37:10058)
+    at oz (https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:37:31424) @ https://nicolascaramesgarcia.vercel.app/assets/index-Cas0BMea.js:78
