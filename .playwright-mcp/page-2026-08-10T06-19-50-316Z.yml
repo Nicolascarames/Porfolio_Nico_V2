@@ -1,0 +1,12 @@
+- generic [ref=f4e2]:
+  - navigation [ref=f4e3]:
+    - link "Nico" [ref=f4e4] [cursor=pointer]:
+      - /url: "#top"
+    - button "Cerrar sesión" [ref=f4e6]
+  - generic [ref=f4e8]:
+    - navigation [ref=f4e9]:
+      - link "Perfil" [ref=f4e10] [cursor=pointer]:
+        - /url: /profile
+    - generic [ref=f4e11]:
+      - heading "Your profile" [level=1] [ref=f4e12]
+      - generic [ref=f4e13]: Loading…

@@ -1,0 +1,62 @@
+- generic [ref=f4e2]:
+  - navigation [ref=f4e3]:
+    - link "Nico" [ref=f4e4] [cursor=pointer]:
+      - /url: "#top"
+    - button "Cerrar sesión" [ref=f4e6]
+  - generic [ref=f4e29]:
+    - navigation [ref=f4e30]:
+      - link "Perfil" [ref=f4e31] [cursor=pointer]:
+        - /url: /profile
+      - link "Admin" [ref=f4e32] [cursor=pointer]:
+        - /url: /admin
+    - generic [ref=f4e33]:
+      - heading "Users" [level=2] [ref=f4e34]
+      - textbox "Search users" [ref=f4e36]:
+        - /placeholder: Search by name or email
+      - table [ref=f4e37]:
+        - rowgroup [ref=f4e38]:
+          - row [ref=f4e39]:
+            - columnheader "User" [ref=f4e40]
+            - columnheader "Email" [ref=f4e41]
+            - columnheader "Role" [ref=f4e42]
+        - rowgroup [ref=f4e43]:
+          - row [ref=f4e44]:
+            - cell "navidadncg_7f55d2" [ref=f4e45]
+            - cell "navidadncg@gmail.com" [ref=f4e46]
+            - cell "user" [ref=f4e47]:
+              - combobox "Role for navidadncg_7f55d2" [ref=f4e48]:
+                - option "user" [selected]
+                - option "mid"
+                - option "admin"
+          - row [ref=f4e49]:
+            - cell "caramesgarcianico" [ref=f4e50]
+            - cell "caramesgarcianico@gmail.com" [ref=f4e51]
+            - cell "admin" [ref=f4e52]:
+              - combobox "Role for caramesgarcianico" [ref=f4e53]:
+                - option "user"
+                - option "mid"
+                - option "admin" [selected]
+          - row [ref=f4e54]:
+            - cell "d427ce6a-b3d6-444d-9018-eca908dea3dc" [ref=f4e55]
+            - cell "carmenvillagomez1996@gmail.com" [ref=f4e56]
+            - cell "user" [ref=f4e57]:
+              - combobox "Role for d427ce6a-b3d6-444d-9018-eca908dea3dc" [ref=f4e58]:
+                - option "user" [selected]
+                - option "mid"
+                - option "admin"
+          - row [ref=f4e59]:
+            - cell "casperncg_abafc7" [ref=f4e60]
+            - cell "casperncg@gmail.com" [ref=f4e61]
+            - cell "user" [ref=f4e62]:
+              - combobox "Role for casperncg_abafc7" [ref=f4e63]:
+                - option "user" [selected]
+                - option "mid"
+                - option "admin"
+          - row [ref=f4e64]:
+            - cell "qa-tabs-test_6ad860" [ref=f4e65]
+            - cell "qa-tabs-test@example.com" [ref=f4e66]
+            - cell "admin" [ref=f4e67]:
+              - combobox "Role for qa-tabs-test_6ad860" [disabled] [ref=f4e68]:
+                - option "user"
+                - option "mid"
+                - option "admin" [selected]

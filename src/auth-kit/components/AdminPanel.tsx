@@ -68,7 +68,7 @@ export function AdminPanel() {
   }
 
   return (
-    <div className="flex flex-col gap-3 p-6">
+    <div className="flex w-full flex-col gap-3 rounded-[28px] border border-white/10 bg-surface p-8 shadow-card">
       <h2 className="text-xl font-semibold text-white">Users</h2>
       {error && <p className="text-sm text-red-300">{error}</p>}
       <div className="relative w-full max-w-xs">

@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { scrollToId } from '../lib/scroll';
 import { useAuth } from '../auth-kit/hooks/useAuth';
 
@@ -37,23 +37,15 @@ export function Nav() {
             </button>
           </>
         )}
-        {!loading &&
-          (user ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="nav-cta rounded-full bg-accent px-[18px] py-[9px] font-display text-sm font-semibold transition hover:bg-white hover:-translate-y-px"
-            >
-              Cerrar sesión
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              className="nav-cta rounded-full bg-accent px-[18px] py-[9px] font-display text-sm font-semibold transition hover:bg-white hover:-translate-y-px"
-            >
-              Privado
-            </Link>
-          ))}
+        {!loading && user && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="nav-cta rounded-full bg-accent px-[18px] py-[9px] font-display text-sm font-semibold transition hover:bg-white hover:-translate-y-px"
+          >
+            Cerrar sesión
+          </button>
+        )}
       </div>
     </nav>
   );

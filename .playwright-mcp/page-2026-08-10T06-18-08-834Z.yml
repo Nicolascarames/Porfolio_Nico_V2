@@ -1,0 +1,142 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "Nico" [ref=e4] [cursor=pointer]:
+      - /url: "#top"
+    - generic [ref=e5]:
+      - button "Contacto" [ref=e6]
+      - button "Sobre mí" [ref=e7]
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - heading "Developer, design and workflows with AI" [level=1] [ref=e12]: Developer, designand workflowswith AI
+      - paragraph [ref=e13]: "Construyo productos digitales de principio a fin: interfaces limpias, código mantenible y experiencias potenciadas por inteligencia artificial. Combino desarrollo, QA y automatización de flujos de trabajo para lanzar más rápido y con mayor calidad."
+    - generic [ref=e15]:
+      - iframe [ref=e20]:
+        
+      - generic [ref=e21]:
+        - button "Abrir escritorio" [ref=e22]
+        - button "Ayuda" [ref=e23]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - text: Proyectos
+        - heading "Cosas que he construido" [level=2] [ref=e26]
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - button [ref=e30]:
+            - img "BabIA" [ref=e31]
+            - generic [ref=e33]:
+              - heading "BabIA" [level=3] [ref=e34]
+              - paragraph [ref=e35]: "App para el sueño de tu bebé: registro, evolución e integración con Telegram."
+          - button [ref=e36]:
+            - img "SonAI" [ref=e37]
+            - generic [ref=e39]:
+              - heading "SonAI" [level=3] [ref=e40]
+              - paragraph [ref=e41]: Landing page para vender automatizaciones por voz con IA.
+          - button [ref=e42]:
+            - img "AI Nav Corp" [ref=e43]
+            - generic [ref=e45]:
+              - heading "AI Nav Corp" [level=3] [ref=e46]
+              - paragraph [ref=e47]: "Juego en pixel art y portfolio jugable: cada personaje integra una IA y una misión."
+          - button [ref=e48]:
+            - img "Desktop Nav" [ref=e49]
+            - generic [ref=e51]:
+              - heading "Desktop Nav" [level=3] [ref=e52]
+              - paragraph [ref=e53]: Simula un escritorio en la web, con IA y flujos de trabajo integrados.
+          - button [ref=e54]:
+            - generic [ref=e57]:
+              - heading "CriptoFiscal" [level=3] [ref=e58]
+              - paragraph [ref=e59]: "App de registro de operaciones cripto e informes fiscales para España: FIFO por activo, conversión a EUR con tipo de cambio histórico, informe de IRPF exportable a PDF."
+        - generic [ref=e60]:
+          - button [ref=e61]:
+            - generic [ref=e64]:
+              - heading [level=3] [ref=e65]: BabIA
+              - paragraph [ref=e66]: "App para el sueño de tu bebé: registro, evolución e integración con Telegram."
+          - button [ref=e67]:
+            - generic [ref=e70]:
+              - heading [level=3] [ref=e71]: SonAI
+              - paragraph [ref=e72]: Landing page para vender automatizaciones por voz con IA.
+          - button [ref=e73]:
+            - generic [ref=e76]:
+              - heading [level=3] [ref=e77]: AI Nav Corp
+              - paragraph [ref=e78]: "Juego en pixel art y portfolio jugable: cada personaje integra una IA y una misión."
+          - button [ref=e79]:
+            - generic [ref=e82]:
+              - heading [level=3] [ref=e83]: Desktop Nav
+              - paragraph [ref=e84]: Simula un escritorio en la web, con IA y flujos de trabajo integrados.
+          - button [ref=e85]:
+            - generic [ref=e88]:
+              - heading [level=3] [ref=e89]: CriptoFiscal
+              - paragraph [ref=e90]: "App de registro de operaciones cripto e informes fiscales para España: FIFO por activo, conversión a EUR con tipo de cambio histórico, informe de IRPF exportable a PDF."
+    - generic [ref=e93]:
+      - generic "JavaScript" [ref=e94]:
+        - img "JavaScript" [ref=e95]
+      - generic "TypeScript" [ref=e96]:
+        - img "TypeScript" [ref=e97]
+      - generic "React" [ref=e98]:
+        - img "React" [ref=e99]
+      - generic "Next.js" [ref=e100]:
+        - img "Next.js" [ref=e101]
+      - generic "Node.js" [ref=e102]:
+        - img "Node.js" [ref=e103]
+      - generic "Python" [ref=e104]:
+        - img "Python" [ref=e105]
+      - generic "HTML5" [ref=e106]:
+        - img "HTML5" [ref=e107]
+      - generic "CSS3" [ref=e108]:
+        - img "CSS3" [ref=e109]
+      - generic "Tailwind" [ref=e110]:
+        - img "Tailwind" [ref=e111]
+      - generic "Git" [ref=e112]:
+        - img "Git" [ref=e113]
+      - generic "Docker" [ref=e114]:
+        - img "Docker" [ref=e115]
+      - generic "PostgreSQL" [ref=e116]:
+        - img "PostgreSQL" [ref=e117]
+      - generic "Jest" [ref=e118]:
+        - img "Jest" [ref=e119]
+      - generic "Selenium" [ref=e120]:
+        - img "Selenium" [ref=e121]
+      - generic "Figma" [ref=e122]:
+        - img "Figma" [ref=e123]
+      - generic "GitHub" [ref=e124]:
+        - img "GitHub" [ref=e125]
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - img "Nico" [ref=e163]
+        - generic [ref=e164]: Nico
+      - generic [ref=e165]:
+        - generic [ref=e166]: Disponible para proyectos
+        - heading "Sobre mí" [level=2] [ref=e168]
+        - paragraph [ref=e169]:
+          - text: Soy
+          - strong [ref=e170]: developer
+          - text: "con foco en calidad. Trabajo el ciclo completo: escribo código, hago"
+          - strong [ref=e171]: QA
+          - text: y aseguro que lo que se lanza funciona de verdad.
+        - paragraph [ref=e172]:
+          - text: Diseño y automatizo
+          - strong [ref=e173]: workflows
+          - text: y aprovecho la
+          - strong [ref=e174]: IA
+          - text: para acelerar cada etapa del desarrollo sin perder control ni criterio.
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - text: Contacto
+        - heading "Hablemos" [level=2] [ref=e178]
+        - paragraph [ref=e179]: Cuéntame tu idea y te respondo pronto.
+      - generic [ref=e180]:
+        - generic [ref=e181]:
+          - text: Nombre
+          - textbox "Nombre" [ref=e182]:
+            - /placeholder: Tu nombre
+        - generic [ref=e183]:
+          - text: Email
+          - textbox "Email" [ref=e184]:
+            - /placeholder: tucorreo@ejemplo.com
+        - generic [ref=e185]:
+          - text: Mensaje
+          - textbox "Mensaje" [ref=e186]:
+            - /placeholder: Cuéntame sobre tu proyecto…
+        - button "Enviar mensaje" [ref=e187]
+    - contentinfo [ref=e188]:
+      - generic [ref=e189]: Nico
+      - generic [ref=e190]: © 2026 · Developer, design & workflows with AI

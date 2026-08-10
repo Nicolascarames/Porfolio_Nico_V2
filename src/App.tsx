@@ -7,6 +7,7 @@ import { AuthCard } from './auth-kit/components/AuthCard';
 import { ProfilePage } from './auth-kit/components/ProfilePage';
 import { AdminPanel } from './auth-kit/components/AdminPanel';
 import { RoleGate } from './auth-kit/components/RoleGate';
+import { PrivateLayout } from './auth-kit/components/PrivateLayout';
 import { HomePage } from './pages/HomePage';
 import { Nav } from './components/Nav';
 
@@ -23,7 +24,11 @@ function ProfileRoute() {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  return <ProfilePage />;
+  return (
+    <PrivateLayout>
+      <ProfilePage />
+    </PrivateLayout>
+  );
 }
 
 function AdminRoute() {
@@ -31,9 +36,11 @@ function AdminRoute() {
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
   return (
-    <RoleGate minRole="admin" fallback={<p className="p-6 text-white/50">Solo admin.</p>}>
-      <AdminPanel />
-    </RoleGate>
+    <PrivateLayout>
+      <RoleGate minRole="admin" fallback={<p className="text-white/50">Solo admin.</p>}>
+        <AdminPanel />
+      </RoleGate>
+    </PrivateLayout>
   );
 }
 

@@ -1,0 +1,24 @@
+- generic [ref=f2e2]:
+  - navigation [ref=f2e3]:
+    - link "Nico" [ref=f2e4] [cursor=pointer]:
+      - /url: "#top"
+    - button "Cerrar sesión" [ref=f2e67]
+  - generic [ref=f2e69]:
+    - navigation [ref=f2e70]:
+      - link "Perfil" [ref=f2e71] [cursor=pointer]:
+        - /url: /profile
+    - generic [ref=f2e72]:
+      - heading "Your profile" [level=1] [ref=f2e73]
+      - generic [ref=f2e74]:
+        - generic [ref=f2e75]:
+          - button "Change avatar" [ref=f2e76]:
+            - generic [ref=f2e77]: Q
+          - generic [ref=f2e78]:
+            - paragraph [ref=f2e79]: qa-tabs-test_6ad860
+            - paragraph [ref=f2e80]: user
+        - generic [ref=f2e81]:
+          - generic [ref=f2e82]:
+            - generic [ref=f2e83]: Username
+            - textbox "Username" [ref=f2e85]: qa-tabs-test_6ad860
+          - button "Save changes" [ref=f2e86]
+        - button "Change email" [ref=f2e87]
