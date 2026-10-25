@@ -14,6 +14,10 @@ export function HomePage() {
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
 
   function handleSelectProject(project: Project) {
+    if (project.externalUrl) {
+      window.open(project.externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
     setOpenProjectId(project.desktopNavId ?? null);
     // Alinea el borde inferior de la Tablet (no del bloque de botones) con
     // el borde inferior de la pantalla: puede ocupar hasta 100vh, así que

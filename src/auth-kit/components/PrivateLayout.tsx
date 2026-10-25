@@ -28,9 +28,14 @@ export function PrivateLayout({ children }: Props) {
             Perfil
           </NavLink>
           {isAdmin && (
-            <NavLink to="/admin" className={tabClass} end>
-              Admin
-            </NavLink>
+            <>
+              <NavLink to="/admin" className={tabClass} end>
+                Admin
+              </NavLink>
+              <NavLink to="/admin/panel" className={tabClass} end>
+                Panel
+              </NavLink>
+            </>
           )}
         </nav>
         {children}

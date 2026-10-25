@@ -14,6 +14,9 @@ export interface Project {
    * en otra pestaña. Se omite quien no tenga ventana propia allí (Desktop
    * Nav es la propia app que se muestra dentro de la Tablet). */
   desktopNavId?: string;
+  /** Proyectos que no pueden abrirse dentro de la Tablet (bloquean iframes,
+   * exigen login o no tienen web): el click los abre en pestaña nueva. */
+  externalUrl?: string;
 }
 
 export const projects: Project[] = [
@@ -44,5 +47,30 @@ export const projects: Project[] = [
     title: 'CriptoFiscal',
     desc: 'App de registro de operaciones cripto e informes fiscales para España: FIFO por activo, conversión a EUR con tipo de cambio histórico, informe de IRPF exportable a PDF.',
     desktopNavId: 'criptofiscal',
+  },
+  {
+    title: 'GiveMe',
+    desc: 'Tarjetas de fidelización digitales para negocios: sellos por NFC o QR, Apple Wallet y Google Wallet, sin que el cliente instale nada.',
+    externalUrl: 'https://givemewallet.com',
+  },
+  {
+    title: 'Gastos del hogar',
+    desc: 'App para llevar los gastos fijos de casa y repartirlos entre dos personas.',
+    externalUrl: 'https://gastos.reality404.app',
+  },
+  {
+    title: 'Agente QA',
+    desc: 'CLI de QA: mapea una web, genera escenarios Gherkin, los convierte en tests de Playwright y saca reportes.',
+    externalUrl: 'https://github.com/Nicolascarames/Agente_QA',
+  },
+  {
+    title: 'Agente QA MCP',
+    desc: 'QA agéntico sobre Playwright MCP: agentes de IA que navegan y prueban la web como lo haría una persona.',
+    externalUrl: 'https://github.com/Nicolascarames/AGENTE-QA-MCP',
+  },
+  {
+    title: 'QA Pruebas',
+    desc: 'Ejercicios prácticos de QA y preparación del examen ISTQB.',
+    externalUrl: 'https://github.com/Nicolascarames/QA_Pruebas',
   },
 ];
