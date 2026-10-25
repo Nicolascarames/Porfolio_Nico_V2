@@ -35,12 +35,12 @@ function ProfileRoute() {
 
 // Admin-only pages. RoleGate is UX; the real protection is RLS on the data
 // (admin_list_users / admin_panel only answer to portfolio.is_admin()).
-function AdminRoute({ children }: { children: ReactNode }) {
+function AdminRoute({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
   return (
-    <PrivateLayout>
+    <PrivateLayout wide={wide}>
       <RoleGate minRole="admin" fallback={<p className="text-white/50">Solo admin.</p>}>
         {children}
       </RoleGate>
@@ -57,7 +57,7 @@ export function App() {
         <Route path="/login" element={<LoginRoute />} />
         <Route path="/profile" element={<ProfileRoute />} />
         <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-        <Route path="/admin/panel" element={<AdminRoute><ServerPanel /></AdminRoute>} />
+        <Route path="/admin/panel" element={<AdminRoute wide><ServerPanel /></AdminRoute>} />
       </Routes>
     </KitProvider>
   );

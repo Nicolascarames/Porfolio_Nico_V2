@@ -64,6 +64,8 @@ const SECTIONS = [
   ["pendientes", "Pendientes"],
 ] as const;
 
+type SectionId = (typeof SECTIONS)[number][0];
+
 const PROJECT_STATE: Record<string, string> = {
   produccion: "🟢 producción",
   a_medias: "🟡 a medias",
@@ -77,6 +79,8 @@ export function ServerPanel() {
   const [uploadedAt, setUploadedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // One section at a time: the pills switch it (no scrolling down the page).
+  const [active, setActive] = useState<SectionId>("servidor");
 
   useEffect(() => {
     let cancelled = false;
@@ -117,20 +121,26 @@ export function ServerPanel() {
         <p className="rounded-lg border border-amber-300/20 bg-amber-300/5 p-3 text-sm text-amber-100/80">
           {panel.meta.aviso_secretos}
         </p>
-        <nav className="flex flex-wrap gap-2 pt-1">
+        <nav className="flex flex-wrap gap-2 pt-1" aria-label="Secciones del panel">
           {SECTIONS.map(([id, label]) => (
-            <a
+            <button
               key={id}
-              href={`#panel-${id}`}
-              className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/70 hover:border-white/30 hover:text-white"
+              type="button"
+              onClick={() => setActive(id)}
+              aria-pressed={active === id}
+              className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                active === id
+                  ? "border-white bg-white text-black"
+                  : "border-white/10 text-white/70 hover:border-white/30 hover:text-white"
+              }`}
             >
               {label}
-            </a>
+            </button>
           ))}
         </nav>
       </Card>
 
-      <Section id="servidor" title="Servidor">
+      <Section active={active} id="servidor" title="Servidor">
         <p className="text-sm text-white/80">{servidor.resumen}</p>
         <Facts
           rows={[
@@ -156,7 +166,7 @@ export function ServerPanel() {
         <Facts rows={panel.huecos.map((h) => [h.hueco, h.que_es])} mono />
       </Section>
 
-      <Section id="comandos" title="Comandos">
+      <Section active={active} id="comandos" title="Comandos">
         {panel.comandos.map((g) => (
           <div key={g.grupo} className="flex flex-col gap-2">
             <SubTitle>{g.grupo}</SubTitle>
@@ -170,7 +180,7 @@ export function ServerPanel() {
         ))}
       </Section>
 
-      <Section id="instalado" title="Instalado">
+      <Section active={active} id="instalado" title="Instalado">
         <ul className="flex flex-col divide-y divide-white/10">
           {panel.instalado.map((i) => (
             <li key={i.nombre} className="flex flex-col gap-0.5 py-2">
@@ -185,7 +195,7 @@ export function ServerPanel() {
         </ul>
       </Section>
 
-      <Section id="servicios" title="Servicios en marcha">
+      <Section active={active} id="servicios" title="Servicios en marcha">
         <ul className="flex flex-col divide-y divide-white/10">
           {panel.servicios.map((s) => (
             <li key={s.nombre} className="flex flex-col gap-1 py-2">
@@ -201,7 +211,7 @@ export function ServerPanel() {
         </ul>
       </Section>
 
-      <Section id="dominio" title={`Dominio · ${dominio.nombre}`}>
+      <Section active={active} id="dominio" title={`Dominio · ${dominio.nombre}`}>
         <Facts
           rows={[
             ["Registrador", dominio.registrador],
@@ -245,7 +255,7 @@ export function ServerPanel() {
         <Bullets items={dominio.reglas} />
       </Section>
 
-      <Section id="webs" title="Webs publicadas">
+      <Section active={active} id="webs" title="Webs publicadas">
         <p className="text-xs text-white/45">Comprobadas: {panel.webs_comprobadas}</p>
         <ul className="flex flex-col divide-y divide-white/10">
           {panel.webs.map((w) => (
@@ -283,7 +293,7 @@ export function ServerPanel() {
         )}
       </Section>
 
-      <Section id="proyectos" title="Proyectos">
+      <Section active={active} id="proyectos" title="Proyectos">
         <ul className="flex flex-col divide-y divide-white/10">
           {panel.proyectos.map((p) => (
             <li key={p.nombre} className="flex flex-col gap-0.5 py-2">
@@ -308,7 +318,7 @@ export function ServerPanel() {
         </ul>
       </Section>
 
-      <Section id="enlaces" title="Enlaces a paneles">
+      <Section active={active} id="enlaces" title="Enlaces a paneles">
         <ul className="flex flex-col gap-2">
           {panel.paneles.map((p) => (
             <li key={p.nombre} className="flex flex-col gap-0.5">
@@ -320,7 +330,7 @@ export function ServerPanel() {
         </ul>
       </Section>
 
-      <Section id="pendientes" title="Pendientes">
+      <Section active={active} id="pendientes" title="Pendientes">
         <ul className="flex flex-col divide-y divide-white/10">
           {panel.pendientes.map((p) => (
             <li key={p.que} className="flex flex-wrap items-baseline gap-2 py-2">
@@ -343,9 +353,20 @@ function Card({ children }: { children: ReactNode }) {
   );
 }
 
-function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+function Section({
+  id,
+  active,
+  title,
+  children,
+}: {
+  id: SectionId;
+  active: SectionId;
+  title: string;
+  children: ReactNode;
+}) {
+  if (id !== active) return null;
   return (
-    <section id={`panel-${id}`} className="scroll-mt-24">
+    <section id={`panel-${id}`}>
       <Card>
         <h3 className="text-lg font-semibold text-white">{title}</h3>
         {children}

@@ -5,12 +5,15 @@ import { useProfile } from "../hooks/useProfile";
 
 interface Props {
   children: ReactNode;
+  /** Wider page (the server panel): 100% on small screens, 50% of the
+   * screen on large ones, never narrower than the default 48rem. */
+  wide?: boolean;
 }
 
 // Tab bar shown once logged in, above /profile and /admin, so switching
 // between them doesn't require retyping the URL. The "Privado" nav button was
 // removed on purpose (2026-08-10) — those routes are reached by URL only.
-export function PrivateLayout({ children }: Props) {
+export function PrivateLayout({ children, wide = false }: Props) {
   const { config } = useAuthKitConfig();
   const { profile } = useProfile();
   const isAdmin = !!profile && config.roles.indexOf(profile.role) >= config.roles.indexOf("admin");
@@ -22,7 +25,7 @@ export function PrivateLayout({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 sm:px-8">
+      <div className={`mx-auto flex w-full ${wide ? "max-w-[max(48rem,50vw)]" : "max-w-3xl"} flex-col gap-6 px-4 py-10 sm:px-8`}>
         <nav className="flex gap-1 self-start rounded-xl bg-surface p-1">
           <NavLink to="/profile" className={tabClass} end>
             Perfil
