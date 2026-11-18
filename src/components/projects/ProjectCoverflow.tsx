@@ -11,7 +11,10 @@ import './projects.css';
  * Diseño_claude_desing/reality404-v2/components/ProjectCoverflow/preview.html.
  */
 
-const STEP_PX = 210; // arrastre equivalente a una tarjeta
+// Proporciones del diseño original (tarjeta de 380 px: paso 210, recogida 70, fondo 160).
+const STEP_RATIO = 210 / 380; // paso entre tarjetas y arrastre equivalente a una
+const TUCK_RATIO = 70 / 380;
+const DEPTH_RATIO = 160 / 380;
 const EASING = 0.14; // aproximación por frame hacia el objetivo
 const DRAG_SLOP = 4; // px
 
@@ -20,6 +23,7 @@ export function ProjectCoverflow({ projects, onSelectProject }: ProjectVariantPr
   const rootRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pos = useRef(0);
+  const cardW = useRef(380); // ancho real de tarjeta (lo fija el CSS con --cf-w)
   const target = useRef(0);
   const [center, setCenter] = useState(0);
   const centerRef = useRef(0);
@@ -30,6 +34,19 @@ export function ProjectCoverflow({ projects, onSelectProject }: ProjectVariantPr
     d = ((d % N) + N) % N;
     return d > N / 2 ? d - N : d;
   };
+
+  // Mide la tarjeta (offsetWidth ignora transforms) y re-mide al redimensionar.
+  useEffect(() => {
+    const first = cardRefs.current[0];
+    if (!first) return;
+    const measure = () => {
+      if (first.offsetWidth) cardW.current = first.offsetWidth;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(first);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!inView) return;
@@ -43,8 +60,9 @@ export function ProjectCoverflow({ projects, onSelectProject }: ProjectVariantPr
         const d = wrap(i - pos.current);
         const a = Math.abs(d);
         const rot = Math.max(-1, Math.min(1, d)) * -48;
-        const x = d * STEP_PX - Math.sign(d) * Math.max(0, a - 1) * 70;
-        const z = -a * 160;
+        const w = cardW.current;
+        const x = d * w * STEP_RATIO - Math.sign(d) * Math.max(0, a - 1) * w * TUCK_RATIO;
+        const z = -a * w * DEPTH_RATIO;
         c.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rot}deg) scale(${a < 0.5 ? 1.06 - a * 0.12 : 1})`;
         c.style.zIndex = String(100 - Math.round(a * 10));
         c.style.opacity = a > 2.4 ? '0' : '1';
@@ -96,7 +114,7 @@ export function ProjectCoverflow({ projects, onSelectProject }: ProjectVariantPr
     d.vx = (e.clientX - d.lastX) / Math.max(1, now - d.lastT);
     d.lastX = e.clientX;
     d.lastT = now;
-    target.current = d.start - dx / STEP_PX;
+    target.current = d.start - dx / (cardW.current * STEP_RATIO);
   }
 
   function onPointerUp(e: PointerEvent<HTMLDivElement>) {

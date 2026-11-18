@@ -47,8 +47,8 @@
  *   'terminal'  Terminal: el mensaje se escribe como comandos.
  */
 export const sections = {
-  projects: 'bento' as 'deck' | 'coverflow' | 'bento',
+  projects: 'coverflow' as 'deck' | 'coverflow' | 'bento',
   tech: 'physics' as 'physics' | 'tower' | 'magnet',
   about: 'badge' as 'badge' | 'bento' | 'terminal',
-  contact: 'glass' as 'glass' | 'chat' | 'terminal',
+  contact: 'terminal' as 'glass' | 'chat' | 'terminal',
 };
