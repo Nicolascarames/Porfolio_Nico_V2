@@ -13,10 +13,14 @@ export function loadMatter(): Promise<Matter> {
 
 /** Matter.Mouse solo escucha la suelta dentro de su elemento: si sueltas
  * fuera de la caja, la ficha se queda pegada al cursor. Esto reenvía la
- * suelta de cualquier sitio de la ventana. Devuelve la función que lo quita. */
+ * suelta de cualquier sitio de la ventana. Devuelve la función que lo quita.
+ * Solo reenvía si hay un arrastre en curso (button 0): el mouseup de Matter
+ * hace preventDefault() en los toques, y aplicado a cualquier touchend de la
+ * página anulaba el clic de todos los botones y enlaces en móvil. */
 export function releaseAnywhere(mouse: MatterNS.Mouse): () => void {
   const up = (mouse as MatterNS.Mouse & Record<string, EventListener>).mouseup;
   const onUp = (e: Event) => {
+    if (mouse.button !== 0) return; // nada cogido: no tocar el evento
     if (e.target instanceof Node && (mouse.element as HTMLElement).contains(e.target)) return; // ya lo trata Matter
     up(e);
   };

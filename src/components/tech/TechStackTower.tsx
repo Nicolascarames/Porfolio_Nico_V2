@@ -3,6 +3,7 @@ import type MatterNS from 'matter-js';
 import { useInView } from '../../hooks/useInView';
 import { prefersReducedMotion } from '../../hooks/useReducedMotion';
 import { detachMouse, loadMatter, releaseAnywhere } from './matter';
+import { useElementWidth } from '../../hooks/useElementWidth';
 import type { TechVariantProps } from './types';
 import './tech.css';
 
@@ -13,7 +14,8 @@ import './tech.css';
  * Diseño_claude_desing/reality404-v2/components/TechStackTower/preview.html.
  */
 
-const S = 60; // lado del bloque
+// Lado del bloque según el ancho de la caja: 48 px por debajo de 520 px (móvil).
+const blockSize = (w: number) => (w < 520 ? 48 : 60);
 const GAP = 4;
 const FLOOR_H = 24;
 const ROWS = [5, 4, 3, 2, 1, 1]; // 16 bloques
@@ -43,9 +45,12 @@ export function TechStackTower({ tech, renderHead }: TechVariantProps) {
   const [failed, setFailed] = useState(false);
 
   if (visible && !started) setStarted(true);
+  // El mundo se recrea si cambia el ancho de la caja (giro, redimensionado).
+  const width = useElementWidth(stageRef);
+  const S = blockSize(width);
 
   useEffect(() => {
-    if (!started) return;
+    if (!started || !width) return;
     let disposed = false;
     let cleanup = () => {};
 
@@ -211,7 +216,7 @@ export function TechStackTower({ tech, renderHead }: TechVariantProps) {
       disposed = true;
       cleanup();
     };
-  }, [started, tech]); // blocksTech se deriva de tech
+  }, [started, tech, width, S]); // blocksTech se deriva de tech
 
   useEffect(() => {
     if (visible) loop.current?.start();
@@ -240,7 +245,7 @@ export function TechStackTower({ tech, renderHead }: TechVariantProps) {
               key={t.name}
               ref={(el) => (chipRefs.current[i] = el)}
               className="tw-chip r4-frost-chip"
-              style={{ transform: 'translate(-200px,-200px)' }}
+              style={{ transform: 'translate(-200px,-200px)', width: S, height: S }}
             >
               <img src={t.src} alt={t.name} draggable={false} />
             </div>

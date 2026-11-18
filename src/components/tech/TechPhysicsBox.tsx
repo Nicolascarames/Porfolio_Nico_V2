@@ -3,6 +3,7 @@ import type MatterNS from 'matter-js';
 import { useInView } from '../../hooks/useInView';
 import { prefersReducedMotion } from '../../hooks/useReducedMotion';
 import { detachMouse, loadMatter, releaseAnywhere } from './matter';
+import { useElementWidth } from '../../hooks/useElementWidth';
 import type { TechVariantProps } from './types';
 import './tech.css';
 
@@ -12,7 +13,8 @@ import './tech.css';
  * Diseño_claude_desing/reality404-v2/components/TechPhysicsBox/preview.html.
  */
 
-const S = 64; // lado de la ficha
+// Lado de la ficha según el ancho de la caja: 48 px por debajo de 520 px (móvil).
+const chipSize = (w: number) => (w < 520 ? 48 : 64);
 const WALL = 200; // grosor de paredes invisibles
 const CEILING_DELAY = 3200; // ms hasta cerrar el techo
 
@@ -33,10 +35,13 @@ export function TechPhysicsBox({ tech, renderHead }: TechVariantProps) {
   const [failed, setFailed] = useState(false);
 
   if (visible && !started) setStarted(true);
+  // El mundo se recrea si cambia el ancho de la caja (giro, redimensionado).
+  const width = useElementWidth(boxRef);
+  const S = chipSize(width);
 
   // Crea el mundo la primera vez que la caja se ve.
   useEffect(() => {
-    if (!started) return;
+    if (!started || !width) return;
     let disposed = false;
     let cleanup = () => {};
 
@@ -57,7 +62,7 @@ export function TechPhysicsBox({ tech, renderHead }: TechVariantProps) {
 
         const items = tech.map((_, i) =>
           M.Bodies.rectangle(60 + ((i * 97) % (W - 120)), -60 - i * 45, S, S, {
-            chamfer: { radius: 16 },
+            chamfer: { radius: S / 4 },
             restitution: 0.45,
             friction: 0.08,
             frictionAir: 0.012,
@@ -146,7 +151,7 @@ export function TechPhysicsBox({ tech, renderHead }: TechVariantProps) {
       disposed = true;
       cleanup();
     };
-  }, [started, tech]);
+  }, [started, tech, width, S]);
 
   // Pausa el bucle cuando la caja sale de pantalla.
   useEffect(() => {
@@ -175,7 +180,7 @@ export function TechPhysicsBox({ tech, renderHead }: TechVariantProps) {
               key={t.name}
               ref={(el) => (chipRefs.current[i] = el)}
               className="tp-chip r4-frost-chip"
-              style={{ transform: 'translate(-200px,-200px)' }}
+              style={{ transform: 'translate(-200px,-200px)', width: S, height: S }}
               aria-hidden="true"
             >
               <img src={t.src} alt="" draggable={false} />

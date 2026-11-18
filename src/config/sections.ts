@@ -34,7 +34,7 @@
  *   'physics'   Caja con física real: las fichas caen, se apilan, se cogen
  *               y se lanzan. Botones "Agitar caja" e "Invertir gravedad".
  *   'tower'     Pirámide de 16 fichas que se derriba (bola, empujones) y se
- *               reconstruye sola. La más "juego". Necesita ≥ 340 px de ancho.
+ *               reconstruye sola. La más "juego". En móvil usa bloques más pequeños.
  *   'magnet'    Nube de iconos flotando con hilos de luz; el cursor los
  *               repele o atrae. Sin motor de física (la más ligera).
  *

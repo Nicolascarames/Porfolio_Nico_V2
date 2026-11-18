@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { tech } from '../../data/tech';
 import { sections } from '../../config/sections';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { TechPhysicsBox } from './TechPhysicsBox';
@@ -37,18 +36,13 @@ const CHOICES = OPTIONS.map((o) => o.value);
 
 /** Sección de tecnologías: el visitante elige variante; config/sections.ts fija la inicial. */
 export function TechSection() {
-  const [picked, setPicked] = useStoredChoice<Choice>('r4-tech-variant', CHOICES, sections.tech);
-  // La pirámide de 5 necesita ≥ 340 px de caja: con el padding de 20 px por
-  // lado, eso son 380 px de viewport. Por debajo cae a la caja de física.
-  const tooNarrow = useMediaQuery('(max-width: 379px)');
-  const choice = tooNarrow && picked === 'tower' ? 'physics' : picked;
-  const options = tooNarrow ? OPTIONS.filter((o) => o.value !== 'tower') : OPTIONS;
+  const [choice, setChoice] = useStoredChoice<Choice>('r4-tech-variant', CHOICES, sections.tech);
   const Variant = VARIANTS[choice];
   return (
     <section id="stack" className="border-t border-white/5 py-16 sm:py-[90px]">
       <div className="mx-auto max-w-[1200px] px-5 sm:px-[60px]">
         <div className="mb-6 flex justify-end">
-          <SegmentedControl label="Vista de tecnologías" options={options} value={choice} onChange={setPicked} />
+          <SegmentedControl label="Vista de tecnologías" options={OPTIONS} value={choice} onChange={setChoice} />
         </div>
         <Variant tech={tech} renderHead={renderHead} />
       </div>
