@@ -52,11 +52,13 @@ export function TechMagnetCloud({ tech, renderHead }: TechVariantProps) {
     cv.width = W * dpr;
     cv.height = H * dpr;
     cv.getContext('2d')?.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const rows = Math.ceil(tech.length / COLS);
+    // En cajas estrechas (móvil) 6 columnas solapan los iconos de 58 px: 4.
+    const cols = W < 600 ? 4 : COLS;
+    const rows = Math.ceil(tech.length / cols);
     const reduced = prefersReducedMotion();
     nodes.current = tech.map((_, i) => {
-      const row = Math.floor(i / COLS);
-      const hx = ((i % COLS) + 0.5 + (row % 2 ? 0.25 : -0.25)) * (W / COLS);
+      const row = Math.floor(i / cols);
+      const hx = ((i % cols) + 0.5 + (row % 2 ? 0.25 : -0.25)) * (W / cols);
       const hy = (row + 0.5) * (H / rows);
       // Con reduced motion aparecen ya en su sitio (sin salir del centro).
       return { hx, hy, x: reduced ? hx : W / 2, y: reduced ? hy : H / 2, vx: 0, vy: 0, ph: Math.random() * 6.28, drag: false, hot: false };

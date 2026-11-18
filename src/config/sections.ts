@@ -34,10 +34,21 @@
  *   'magnet'    Nube de iconos flotando con hilos de luz; el cursor los
  *               repele o atrae. Sin motor de física (la más ligera).
  *
- * (Las secciones de sobre mí y contacto se añadirán aquí en sus fases, con
- * el mismo formato.)
+ * about (sección "Sobre mí"):
+ *   'badge'     Credencial de vidrio colgada de una cinta: se arrastra, se
+ *               balancea y al hacer clic gira para mostrar el reverso.
+ *   'bento'     La información en piezas: foto, bio, disponible, hora local,
+ *               nº de proyectos, stack diario y ciclo de trabajo.
+ *   'terminal'  Terminal que escribe sola la bio y luego acepta comandos.
+ *
+ * contact (sección "Contacto"; las tres envían de verdad a /api/contact):
+ *   'glass'     Formulario de vidrio clásico (nombre, email, mensaje).
+ *   'chat'      Conversación: el formulario pregunta campo a campo.
+ *   'terminal'  Terminal: el mensaje se escribe como comandos.
  */
 export const sections = {
   projects: 'bento' as 'deck' | 'coverflow' | 'bento',
   tech: 'physics' as 'physics' | 'tower' | 'magnet',
+  about: 'badge' as 'badge' | 'bento' | 'terminal',
+  contact: 'glass' as 'glass' | 'chat' | 'terminal',
 };

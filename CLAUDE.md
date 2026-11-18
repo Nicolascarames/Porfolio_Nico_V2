@@ -42,7 +42,10 @@ Antes de cualquier despliegue a producción (Vercel) — y tras tocar autenticac
 - `Diseño_claude_desing/support.js`: runtime generado ("do not edit"), no forma parte del stack final — no reutilizar en la app real.
 - Capturas y assets de referencia: `Diseño_claude_desing/screenshots/`, `Diseño_claude_desing/uploads/`.
 - Código de la app: `src/` (componentes en `src/components/`, datos en `src/data/`, auth en `src/auth-kit/`), función serverless `api/contact.ts`.
-- Rediseño v2: `Diseño_claude_desing/reality404-v2/` (brief `BRIEF_CLAUDE_CODE.md`, demos `components/*/preview.html`).
+- Rediseño v2: `Diseño_claude_desing/reality404-v2/` (brief `BRIEF_CLAUDE_CODE.md`, demos `components/*/preview.html`). Portado a `src/components/{projects,tech,about,contact}/` (3 variantes por sección + `*Section.tsx` que elige) y `DeviceShowcase` + `src/hooks/useDeviceFullscreen.ts`.
+- **Variante activa de cada sección: `src/config/sections.ts`** (con tutorial dentro). Sin selector visible para el visitante.
+- Estilos de marca: tokens en `src/styles/index.css` (`@theme static`), clases compartidas `r4-*` en `src/styles/r4.css`; cada familia de variantes tiene su `.css` junto a los componentes.
+- Envío de contacto compartido por las 3 variantes: `src/hooks/useContactSubmit.ts` → `POST /api/contact`.
 
 ## Comandos
 

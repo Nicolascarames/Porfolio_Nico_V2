@@ -38,6 +38,8 @@ Memoria viva del proyecto y del usuario. Leer entera al inicio de cada sesión.
 - Variantes v2: el vuelo de la tarjeta va a la caja central de la tablet ampliada (`fullscreenBox()`), no al `#tablet-frame`: la tablet suele estar fuera de pantalla (decisión del usuario). La rueda del Coverflow secuestra el scroll vertical igual que la demo: el usuario lo quiere así.
 - Tokens v2 en `src/styles/index.css` (`@theme static`): colores `--color-*` (utilidades `bg-glass`, `text-ink-muted`...), radios con prefijo **`--radius-r4-*`** (`rounded-r4-lg`) porque `rounded-lg/xl` de Tailwind ya se usan con su valor por defecto; `--space-*` y `--duration-*` como variables en `:root`. Clases `r4-*` en `src/styles/r4.css`; el fondo es `.r4-stage-bg`. El token `surface` de diseño NO se mapeó (choca con `--color-surface` del auth-kit).
 
+- **`npm test` en Windows**: lanzado desde `c:\GitHub\...` (c minúscula), vitest falla con `Cannot read properties of undefined (reading 'config')` y 0 tests. No es el código: se lanza desde `C:\GitHub\Porfolio_Nico_V2` (C mayúscula) y pasan los 4. Igual con `npm run dev`: arrancado desde `c:` el watcher de Vite deja de ver cambios a mitad de sesión y sirve módulos viejos. Arrancarlo siempre desde `C:\`.
+
 ## Decisiones pendientes
 
 - **Tarea aparte en Desktop_Nav**: puente de Esc (postMessage) para que Esc cierre la pantalla completa aunque el foco esté dentro del iframe. El detalle está en `C:\GitHub\Desktop_Nav\docs\PENDIENTES.md`. No arreglarlo desde este repo.

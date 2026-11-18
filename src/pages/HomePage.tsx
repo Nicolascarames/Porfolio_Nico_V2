@@ -4,8 +4,8 @@ import { DeviceShowcase, type DeviceShowcaseHandle } from '../components/DeviceS
 import { ProjectsSection } from '../components/projects/ProjectsSection';
 import { flyTo } from '../lib/flyTo';
 import { TechSection } from '../components/tech/TechSection';
-import { About } from '../components/About';
-import { ContactForm } from '../components/ContactForm';
+import { AboutSection } from '../components/about/AboutSection';
+import { ContactSection } from '../components/contact/ContactSection';
 import { Footer } from '../components/Footer';
 import { scrollToId } from '../lib/scroll';
 import type { Project } from '../data/projects';
@@ -48,8 +48,8 @@ export function HomePage() {
         <DeviceShowcase ref={deviceRef} openProjectId={openProjectId} title={openTitle} />
         <ProjectsSection onSelectProject={handleSelectProject} />
         <TechSection />
-        <About />
-        <ContactForm />
+        <AboutSection />
+        <ContactSection />
         <Footer />
       </div>
     </div>

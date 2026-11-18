@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { tech } from '../../data/tech';
 import { sections } from '../../config/sections';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { TechPhysicsBox } from './TechPhysicsBox';
 import { TechStackTower } from './TechStackTower';
 import { TechMagnetCloud } from './TechMagnetCloud';
@@ -26,7 +27,11 @@ function renderHead(actions?: ReactNode) {
 
 /** Sección de tecnologías: la variante de config/sections.ts. */
 export function TechSection() {
-  const Variant = VARIANTS[sections.tech];
+  // La pirámide de 5 necesita ≥ 340 px de caja: con el padding de 20 px por
+  // lado, eso son 380 px de viewport. Por debajo cae a la caja de física.
+  const tooNarrow = useMediaQuery('(max-width: 379px)');
+  const choice = tooNarrow && sections.tech === 'tower' ? 'physics' : sections.tech;
+  const Variant = VARIANTS[choice];
   return (
     <section id="stack" className="border-t border-white/5 py-16 sm:py-[90px]">
       <div className="mx-auto max-w-[1200px] px-5 sm:px-[60px]">

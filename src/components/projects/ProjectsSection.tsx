@@ -1,5 +1,6 @@
 import { projects } from '../../data/projects';
 import { sections } from '../../config/sections';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { ProjectDeck } from './ProjectDeck';
 import { ProjectCoverflow } from './ProjectCoverflow';
 import { ProjectBento } from './ProjectBento';
@@ -17,7 +18,10 @@ interface ProjectsSectionProps {
 
 /** Sección de proyectos: cabecera común + la variante de config/sections.ts. */
 export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
-  const Variant = VARIANTS[sections.projects];
+  // En móvil el Coverflow (tarjetas de 380 px girando en 3D) cae a la baraja, más táctil.
+  const isMobile = useMediaQuery('(max-width: 820px)');
+  const choice = isMobile && sections.projects === 'coverflow' ? 'deck' : sections.projects;
+  const Variant = VARIANTS[choice];
   return (
     <section id="proyectos" className="border-t border-white/5 py-16 sm:py-[90px]">
       <div className="mb-8 px-5 sm:px-[60px]">
