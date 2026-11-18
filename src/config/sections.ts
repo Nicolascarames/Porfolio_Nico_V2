@@ -1,6 +1,10 @@
 /**
  * Variante activa de cada sección (rediseño reality404 v2).
- * Decisión: se elige solo aquí, sin selector visible para el visitante.
+ * Proyectos y about se eligen solo aquí. Tech y contacto llevan además un
+ * selector visible: aquí se fija la variante con la que arrancan, y la que
+ * elija el visitante se recuerda en su navegador (localStorage), por lo que
+ * un cambio aquí no se nota en un navegador que ya eligió otra. Contacto
+ * solo ofrece terminal y formulario (glass); con 'chat' no sale selector.
  *
  * ── Cómo cambiar la variante por defecto ─────────────────────────────────
  *

@@ -72,3 +72,10 @@
   .r4-playing .r4-media-img { animation: none; }
   .r4-sheen { transition: none; }
 }
+
+/* Control segmentado de vidrio (selector de variante visible al visitante) */
+.r4-seg { display: inline-flex; padding: 4px; gap: 4px; border-radius: var(--radius-pill); }
+.r4-seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: var(--radius-pill); font: 600 13px var(--font-display); color: var(--color-ink-muted); cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast); }
+.r4-seg button:hover { color: var(--color-ink); }
+.r4-seg button[aria-pressed="true"] { background: var(--color-frost-100); color: var(--color-on-frost); }
