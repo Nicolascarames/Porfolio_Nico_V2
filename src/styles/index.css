@@ -1,9 +1,11 @@
 @import "tailwindcss";
 @import "../auth-kit/config/theme.css";
+@import "./r4.css";
 
 @theme {
   --color-bg: #0a0a0a;
-  --color-accent: #f2efcf;
+  /* frost-100 (reality404 v2); antes crema #f2efcf */
+  --color-accent: #dfe1ec;
   --color-text: #f4f3ee;
   --font-display: "Space Grotesk", sans-serif;
   --font-body: "Manrope", sans-serif;
@@ -17,6 +19,62 @@
   --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
+/* reality404 v2 — tokens de Diseño_claude_desing/reality404-v2/tokens.json.
+   `static` para que existan como variables CSS aunque solo los use r4.css.
+   Los radios llevan prefijo r4- porque rounded-lg/xl de Tailwind ya se usan
+   en el sitio con su valor por defecto. */
+@theme static {
+  --color-void: #000000;
+  --color-surface-raised: #141418;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-strong: rgba(255, 255, 255, 0.1);
+  --color-glass-edge: rgba(255, 255, 255, 0.16);
+  --color-glass-highlight: rgba(255, 255, 255, 0.42);
+  --color-frost-100: #dfe1ec;
+  --color-frost-200: #b2b5c5;
+  --color-frost-300: #8c8e9e;
+  --color-frost-400: #5f626d;
+  --color-ink: #f4f3ee;
+  --color-ink-muted: #a3a4ad;
+  --color-ink-faint: #73747d;
+  --color-on-frost: #0a0a0a;
+  --color-signal-live: #4ade80;
+  --color-signal-error: #ff8a7a;
+  --color-focus-ring: #eef0f8;
+
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -12px 30px rgba(255, 255, 255, 0.04), 0 20px 50px -20px rgba(0, 0, 0, 0.9);
+  --shadow-frost-glow: 0 0 0 1px rgba(223, 225, 236, 0.35), 0 0 28px rgba(223, 225, 236, 0.18);
+  --shadow-lift: 0 30px 80px -20px rgba(0, 0, 0, 0.95);
+
+  --radius-r4-sm: 12px;
+  --radius-r4-md: 16px;
+  --radius-r4-lg: 22px;
+  --radius-r4-xl: 28px;
+  --radius-pill: 999px;
+
+  --blur-glass: 18px;
+  --blur-overlay: 24px;
+
+  --ease-liquid: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 40px;
+  --space-7: 60px;
+  --space-8: 120px;
+  --duration-fast: 160ms;
+  --duration-base: 320ms;
+  --duration-slow: 640ms;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -26,8 +84,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  background: var(--color-void);
   color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
   font-family: var(--font-body);
 }
 
