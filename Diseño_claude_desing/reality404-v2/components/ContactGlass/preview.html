@@ -1,0 +1,66 @@
+<!-- @dsCard group="Contacto" height=640 subtitle="Formulario de vidrio líquido: el borde cromado sigue al cursor; envío con el 404 brillando" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>ContactGlass — preview</title>
+<style>
+  .cg-wrap { padding: 36px 24px; min-height: 640px; display: grid; place-items: center; }
+  .cg { width: min(560px, 100%); }
+  .cg-head { text-align: center; margin-bottom: 24px; }
+  .form { position: relative; display: flex; flex-direction: column; gap: 18px; padding: 30px; border-radius: var(--radius-lg); }
+  /* borde cromado que sigue al cursor: una capa con máscara de 1px */
+  .form::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+    background: radial-gradient(260px circle at var(--mx,50%) var(--my,0%), rgba(255,255,255,.95), rgba(223,225,236,.35) 30%, transparent 60%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+  .field { position: relative; }
+  .field input, .field textarea { width: 100%; padding: 22px 16px 10px; border-radius: var(--radius-sm); background: rgba(10,10,10,.7); border: 1px solid rgba(255,255,255,.1); color: var(--ink); font-size: 15px; outline: none; resize: vertical;
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  .field textarea { min-height: 120px; }
+  .field label { position: absolute; left: 17px; top: 16px; font-size: 15px; color: var(--ink-faint); pointer-events: none; transition: all var(--duration-fast) var(--ease-liquid); }
+  .field input:focus, .field textarea:focus { border-color: var(--frost-200); box-shadow: 0 0 0 4px rgba(223,225,236,.08), 0 0 24px rgba(223,225,236,.12); }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label, .field textarea:focus + label, .field textarea:not(:placeholder-shown) + label { top: 7px; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--frost-200); }
+  .field.bad input { border-color: var(--signal-error); }
+  .err { font-size: 12px; color: var(--signal-error); margin-top: 6px; display: none; }
+  .field.bad .err { display: block; }
+  .send { position: relative; height: 52px; border-radius: var(--radius-sm); overflow: hidden; }
+  .send .lbl { transition: opacity var(--duration-fast), transform var(--duration-base) var(--ease-liquid); }
+  .send .orb { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.6); transition: opacity var(--duration-base), transform var(--duration-base) var(--ease-spring); }
+  .send .orb span { font: 700 22px/1 var(--font-display); letter-spacing: -.04em; color: var(--on-frost); animation: glow 1s ease-in-out infinite alternate; }
+  .sending .send .lbl { opacity: 0; transform: translateY(-14px); }
+  .sending .send .orb { opacity: 1; transform: none; }
+  @keyframes glow { from { opacity: .45; } to { opacity: 1; } }
+  .done { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; padding: 30px; border-radius: inherit; background: rgba(8,8,10,.92); opacity: 0; pointer-events: none; transition: opacity var(--duration-base); }
+  .sent .done { opacity: 1; pointer-events: auto; }
+  .done img { width: 200px; mix-blend-mode: screen; animation: rise var(--duration-slow) var(--ease-spring); }
+  @keyframes rise { from { transform: translateY(20px) scale(.9); opacity: 0; } }
+</style></head>
+<body>
+<div id="root" class="r4-stage cg-wrap">
+  <div class="cg">
+    <div class="cg-head"><div class="r4-eyebrow">Contacto</div><h2 class="r4-title" style="font-size:44px;margin-top:10px">Hablemos</h2><p style="color:var(--ink-muted);margin:8px 0 0">Cuéntame tu idea y te respondo pronto.</p></div>
+    <form class="form r4-glass" id="form" novalidate>
+      <div class="field"><input id="n" name="name" placeholder=" " required autocomplete="name"><label for="n">Nombre</label></div>
+      <div class="field"><input id="e" name="email" type="email" placeholder=" " required autocomplete="email"><label for="e">Email</label><div class="err">Ese email no parece válido.</div></div>
+      <div class="field"><textarea id="m" name="message" placeholder=" " required></textarea><label for="m">Mensaje</label></div>
+      <button class="r4-btn send" type="submit"><span class="lbl">Enviar mensaje</span><span class="orb" aria-hidden="true"><span>404</span></span></button>
+      <div class="done" role="status"><img src="../../assets/logo-404-horizontal.png" alt=""><strong style="font:600 20px var(--font-display)">Mensaje encontrado.</strong><span style="color:var(--ink-muted);font-size:14px">Gracias, te responderé muy pronto.</span><button type="button" class="r4-btn-ghost" id="again">Enviar otro</button></div>
+    </form>
+  </div>
+</div>
+<script>
+(function () {
+  var f = document.getElementById('form');
+  f.addEventListener('pointermove', function (e) { var r = f.getBoundingClientRect(); f.style.setProperty('--mx', e.clientX - r.left + 'px'); f.style.setProperty('--my', e.clientY - r.top + 'px'); });
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var em = f.querySelector('#e'), bad = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.value);
+    em.parentNode.classList.toggle('bad', bad);
+    if (bad || !f.checkValidity()) { (bad ? em : f.querySelector(':invalid')).focus(); return; }
+    f.classList.add('sending'); f.querySelector('.send').disabled = true;
+    // En el sitio real: await fetch('/api/contact', { method: 'POST', body: JSON.stringify(data) })
+    setTimeout(function () { f.classList.remove('sending'); f.classList.add('sent'); }, 1400);
+  });
+  document.getElementById('again').onclick = function () { f.reset(); f.classList.remove('sent'); f.querySelector('.send').disabled = false; };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+/* reality404 — estilos compartidos: vidrio esmerilado, cromo líquido, halo 404.
+   Lee los tokens de tokens.css (var(--void), var(--glass)…). Prefijo r4-. */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+html, body { margin: 0; background: var(--void); color: var(--ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* Escenario: negro puro con el fondo 404 cromado muy tenue detrás, para que el vidrio tenga algo que esmerilar */
+.r4-stage { position: relative; isolation: isolate; overflow: hidden; background: var(--void); }
+.r4-stage::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("../assets/fondo-404-cromo-1920.webp") center/cover; opacity: .35; }
+.r4-stage::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at center, rgba(0,0,0,.15) 0%, rgba(0,0,0,.8) 100%); }
+
+/* Vidrio esmerilado */
+.r4-glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-glass);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+  backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+}
+/* Ficha de vidrio claro (el cuerpo del logo 404): para iconos de marca con tinta oscura */
+.r4-frost-chip {
+  background: linear-gradient(160deg, rgba(238,240,248,.96), rgba(178,181,197,.88));
+  border: 1px solid rgba(255,255,255,.7);
+  box-shadow: inset 0 1px 0 #fff, inset 0 -6px 14px rgba(95,98,109,.35), 0 0 18px rgba(223,225,236,.18), 0 14px 30px -12px rgba(0,0,0,.9);
+}
+
+/* Texto con el aspecto del logo: cuerpo esmerilado + halo interior */
+.r4-frost-text { color: var(--frost-100); text-shadow: 0 0 1px #fff, 0 0 14px rgba(223,225,236,.55), 0 0 40px rgba(223,225,236,.18); }
+
+.r4-eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+.r4-title { font-family: var(--font-display); font-weight: 600; letter-spacing: -.03em; line-height: 1.05; margin: 0; }
+
+/* Botones */
+.r4-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; cursor: pointer; border-radius: var(--radius-pill); padding: 13px 22px;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  background: var(--frost-100); color: var(--on-frost);
+  box-shadow: inset 0 1px 0 #fff, inset 0 -4px 10px rgba(95,98,109,.35), 0 0 24px rgba(223,225,236,.15);
+  transition: transform var(--duration-fast) var(--ease-liquid), box-shadow var(--duration-fast), background var(--duration-fast);
+}
+.r4-btn:hover { background: #fff; transform: translateY(-1px); box-shadow: inset 0 1px 0 #fff, 0 0 32px rgba(223,225,236,.35); }
+.r4-btn:disabled { opacity: .6; cursor: default; transform: none; }
+.r4-btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  border-radius: var(--radius-pill); padding: 12px 20px; font-family: var(--font-display); font-weight: 600; font-size: 14px;
+  background: var(--glass); color: var(--ink); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
+}
+.r4-btn-ghost:hover { background: var(--glass-strong); box-shadow: var(--shadow-frost-glow); }
+.r4-icon-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
+
+/* Medio de proyecto: <video> si hay vídeo; si no, captura con barrido lento que imita reproducción */
+.r4-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.r4-media-img { transform-origin: 50% 0; transition: transform 1.2s var(--ease-liquid); }
+.r4-playing .r4-media-img { animation: r4-pan 9s var(--ease-liquid) infinite alternate; }
+@keyframes r4-pan { 0% { transform: scale(1.04) translateY(0); } 100% { transform: scale(1.12) translateY(-6%); } }
+.r4-live { position: absolute; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: var(--radius-pill);
+  font: 600 11px/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ink);
+  background: rgba(0,0,0,.45); border: 1px solid var(--glass-edge); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transition: opacity var(--duration-fast); }
+.r4-live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--frost-100); box-shadow: 0 0 8px var(--frost-100); }
+.r4-playing .r4-live { opacity: 1; }
+/* Brillo especular que recorre el cristal */
+.r4-sheen { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.14) 45%, transparent 60%); background-size: 250% 100%; background-position: 120% 0; transition: background-position .9s var(--ease-liquid); }
+.r4-playing .r4-sheen, :hover > .r4-sheen { background-position: -20% 0; }
+
+/* Mini tablet de las previews (sustituye a DeviceShowcase en el sitio real) */
+.r4-mini-tablet { position: relative; width: 220px; aspect-ratio: 4/3; margin: 0 auto; border-radius: 18px; padding: 9px; background: linear-gradient(160deg,#2a2b31,#0c0c0f); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 20px 40px -18px #000; }
+.r4-mini-tablet__screen { position: relative; width: 100%; height: 100%; border-radius: 10px; overflow: hidden; background: var(--surface); display: grid; place-items: center; }
+.r4-mini-tablet__screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.r4-mini-tablet__label { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 8px 6px; font: 600 11px var(--font-display); background: linear-gradient(transparent, rgba(0,0,0,.85)); }
+.r4-mini-tablet__idle { font: 500 10px var(--font-mono); color: var(--ink-faint); text-align: center; }
+.r4-mini-tablet.is-hit { animation: r4-hit .5s var(--ease-spring); }
+@keyframes r4-hit { 0% { transform: scale(1); } 40% { transform: scale(1.05); box-shadow: 0 0 0 1px rgba(223,225,236,.5), 0 0 40px rgba(223,225,236,.35); } 100% { transform: scale(1); } }
+
+.r4-hint { font: 500 12px var(--font-body); color: var(--ink-faint); text-align: center; }
+.r4-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .r4-playing .r4-media-img { animation: none; }
+  * { scroll-behavior: auto !important; }
+}

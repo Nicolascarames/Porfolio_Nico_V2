@@ -1,0 +1,109 @@
+<!-- @dsCard group="Sobre mí" height=600 subtitle="Credencial 404 colgante: arrástrala y se balancea; clic para darle la vuelta" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>AboutBadge — preview</title>
+<style>
+  .ab-wrap { min-height: 600px; display: grid; grid-template-columns: 340px 1fr; align-items: center; gap: 24px; padding: 0 40px 0 0; }
+  .rig { position: relative; height: 600px; touch-action: none; }
+  .rig svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .badge { position: absolute; left: 0; top: 0; width: 240px; height: 350px; cursor: grab; perspective: 1200px; user-select: none; }
+  .badge:active { cursor: grabbing; }
+  .inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform var(--duration-slow) var(--ease-spring); }
+  .badge.flipped .inner { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; border-radius: 20px; padding: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; display: flex; flex-direction: column; }
+  .face::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--gx,30%) var(--gy,10%), rgba(255,255,255,.18), transparent 50%); }
+  .back { transform: rotateY(180deg); }
+  .slot { width: 46px; height: 8px; border-radius: 99px; margin: 0 auto 12px; background: rgba(0,0,0,.7); box-shadow: inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.2); }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .top img { height: 26px; mix-blend-mode: screen; }
+  .id { font: 500 10px var(--font-mono); color: var(--ink-faint); letter-spacing: .08em; }
+  .photo { flex: 1; border-radius: 12px; overflow: hidden; background: var(--surface); position: relative; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: grayscale(.25) contrast(1.05); pointer-events: none; }
+  .name { font: 700 28px/1 var(--font-display); letter-spacing: -.03em; margin-top: 12px; }
+  .role { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+  .live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-muted); margin-top: 8px; }
+  .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--signal-live); box-shadow: 0 0 8px var(--signal-live); }
+  .back h3 { margin: 4px 0 10px; font: 600 16px var(--font-display); }
+  .back dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 12.5px; }
+  .back dt { color: var(--ink-faint); font: 500 11px var(--font-mono); padding-top: 2px; }
+  .back dd { margin: 0; }
+  .bars { margin-top: auto; height: 28px; background: repeating-linear-gradient(90deg, var(--frost-200) 0 2px, transparent 2px 4px, var(--frost-200) 4px 5px, transparent 5px 9px); opacity: .5; border-radius: 4px; }
+  .copy p { font-size: 17px; line-height: 1.65; color: var(--ink-muted); margin: 0 0 14px; max-width: 520px; }
+  .copy strong { color: var(--ink); font-weight: 600; }
+</style></head>
+<body>
+<div id="root" class="r4-stage ab-wrap">
+  <div class="rig" id="rig">
+    <svg id="svg"><defs><linearGradient id="strap" x1="0" x2="1"><stop offset="0" stop-color="#3a3b42"/><stop offset=".5" stop-color="#c9ccd8"/><stop offset="1" stop-color="#3a3b42"/></linearGradient></defs>
+      <path id="s1" stroke="#2c2d33" stroke-width="14" fill="none" stroke-linecap="round"/><path id="s2" stroke="rgba(223,225,236,.45)" stroke-width="2" fill="none" stroke-dasharray="1 0"/>
+      <rect id="clip" width="34" height="22" rx="6" fill="#8c8e9e" stroke="#dfe1ec" stroke-width="1"/></svg>
+    <div class="badge" id="badge" tabindex="0" role="button" aria-label="Credencial de Nico. Pulsa para darle la vuelta">
+      <div class="inner">
+        <div class="face front r4-glass" style="background:rgba(20,20,24,.72)">
+          <div class="slot"></div>
+          <div class="top"><img src="../../assets/logo-404-cuadrado.png" alt="404"><span class="id">ID · 404-NC</span></div>
+          <div class="photo"><img src="../../assets/nico-700.webp" alt="Foto de Nico"></div>
+          <div class="name r4-frost-text">Nico</div>
+          <div class="role">Developer · QA · Workflows con IA</div>
+          <div class="live">Disponible para proyectos</div>
+        </div>
+        <div class="face back r4-glass" style="background:rgba(20,20,24,.85)">
+          <div class="slot"></div>
+          <h3>reality404 · acceso total</h3>
+          <dl>
+            <dt>BASE</dt><dd>A Coruña, España</dd>
+            <dt>ROL</dt><dd>Developer con foco en calidad</dd>
+            <dt>CICLO</dt><dd>Código → QA → lanzamiento</dd>
+            <dt>EXTRA</dt><dd>Workflows y automatización con IA</dd>
+            <dt>STACK</dt><dd>React · TypeScript · Node · Python</dd>
+          </dl>
+          <div class="bars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="copy">
+    <div class="r4-eyebrow">Sobre mí</div>
+    <h2 class="r4-title" style="font-size:40px;margin:10px 0 18px">Lo que se lanza,<br>funciona de verdad.</h2>
+    <p>Soy <strong>developer</strong> con foco en calidad. Trabajo el ciclo completo: escribo código, hago <strong>QA</strong> y aseguro que lo que se lanza funciona de verdad.</p>
+    <p>Diseño y automatizo <strong>workflows</strong> y aprovecho la <strong>IA</strong> para acelerar cada etapa del desarrollo sin perder control ni criterio.</p>
+    <div class="r4-hint" style="text-align:left;margin-top:18px">Tira de la credencial · clic para ver el reverso</div>
+  </div>
+</div>
+<script>
+(function () {
+  var rig = document.getElementById('rig'), badge = document.getElementById('badge'), s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), clip = document.getElementById('clip');
+  var BW = 240, AX = 170, AY = -10, LEN = 150; // ancla fuera de la caja, por arriba
+  var rest = { x: AX, y: AY + LEN }, p = { x: AX + 60, y: AY + LEN - 40 }, v = { x: 0, y: 0 }, dragging = false, off = { x: 0, y: 0 }, moved = 0, ang = 0;
+  var reduced = window.R4 && window.R4.reduced;
+  function rel(e) { var r = rig.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  badge.addEventListener('pointerdown', function (e) { var q = rel(e); dragging = true; moved = 0; off = { x: q.x - p.x, y: q.y - p.y }; badge.setPointerCapture(e.pointerId); });
+  badge.addEventListener('pointermove', function (e) {
+    var r = badge.getBoundingClientRect(); badge.style.setProperty('--gx', (e.clientX - r.left) / r.width * 100 + '%'); badge.style.setProperty('--gy', (e.clientY - r.top) / r.height * 100 + '%');
+    if (!dragging) return; var q = rel(e), nx = q.x - off.x, ny = q.y - off.y; moved += Math.abs(nx - p.x) + Math.abs(ny - p.y);
+    v.x = nx - p.x; v.y = ny - p.y; p.x = nx; p.y = ny;
+  });
+  badge.addEventListener('pointerup', function () { dragging = false; if (moved < 6) badge.classList.toggle('flipped'); });
+  badge.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); badge.classList.toggle('flipped'); v.x += 6; } });
+  (function tick() {
+    if (!dragging) {
+      // muelle hacia la posición de reposo + gravedad; cuerda que no se estira más de LEN*1.6
+      v.x += (rest.x - p.x) * .035; v.y += (rest.y - p.y) * .035 + .4; v.x *= .93; v.y *= .93;
+      if (reduced) { p.x = rest.x; p.y = rest.y; } else { p.x += v.x; p.y += v.y; }
+    }
+    var dx = p.x - AX, dy = p.y - AY, d = Math.hypot(dx, dy), max = LEN * 1.9;
+    if (d > max) { p.x = AX + dx / d * max; p.y = AY + dy / d * max; }
+    var target = Math.atan2(-(p.x - AX), p.y - AY) * 0.9 + v.x * -.02; ang += (target - ang) * .25;
+    var deg = ang * 180 / Math.PI;
+    badge.style.transform = 'translate(' + (p.x - BW / 2) + 'px,' + p.y + 'px) rotate(' + deg + 'deg)';
+    badge.style.transformOrigin = '50% 0';
+    // cinta: curva desde el ancla hasta la pinza
+    var mx = (AX + p.x) / 2 + (p.x - AX) * .1, my = (AY + p.y) / 2 + 20;
+    var dd = 'M' + AX + ' ' + AY + ' Q' + mx + ' ' + my + ' ' + p.x + ' ' + (p.y - 8); s1.setAttribute('d', dd); s2.setAttribute('d', dd);
+    clip.setAttribute('transform', 'translate(' + (p.x - 17) + ' ' + (p.y - 16) + ') rotate(' + deg + ' 17 16)');
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>

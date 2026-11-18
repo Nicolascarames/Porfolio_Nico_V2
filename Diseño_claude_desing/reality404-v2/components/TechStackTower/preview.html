@@ -1,0 +1,88 @@
+<!-- @dsCard group="Tecnologías" height=540 subtitle="Torre apilable: derríbala con el ratón y se recompone sola" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>TechStackTower — preview</title>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<style>
+  .tw-wrap { padding: 24px; min-height: 540px; display: flex; flex-direction: column; gap: 14px; }
+  .tw-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+  .stage { position: relative; height: 400px; border-radius: var(--radius-xl); overflow: hidden; cursor: grab; touch-action: none; }
+  .stage:active { cursor: grabbing; }
+  .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); border-top: 1px solid var(--glass-edge); }
+  .chip { position: absolute; left: 0; top: 0; width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; pointer-events: none; will-change: transform; }
+  .chip img { width: 56%; height: 56%; object-fit: contain; }
+  .ball { position: absolute; left: 0; top: 0; width: 46px; height: 46px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 32% 28%, #fff 0 8%, #c9ccd8 22%, #4a4c55 60%, #0d0d10 100%); box-shadow: 0 0 24px rgba(223,225,236,.35); }
+  .status { position: absolute; top: 16px; left: 18px; font: 500 12px var(--font-mono); color: var(--ink-muted); }
+</style></head>
+<body>
+<div id="root" class="r4-stage tw-wrap">
+  <div class="tw-head">
+    <div><div class="r4-eyebrow">Stack</div><h2 class="r4-title" style="font-size:30px;margin-top:6px">Tecnologías</h2></div>
+    <div style="display:flex;gap:8px"><button class="r4-btn-ghost" id="ball">Lanzar bola</button><button class="r4-btn" id="rebuild">Reconstruir</button></div>
+  </div>
+  <div class="stage r4-glass" id="stage"><div class="floor"></div><div class="status" id="status" aria-live="polite">16 tecnologías en pie</div></div>
+  <div class="r4-hint">Empuja o coge un bloque · se recompone sola a los 5 s</div>
+</div>
+<script>
+(function () {
+  var R = window.R4, M = window.Matter, st = document.getElementById('stage'), status = document.getElementById('status');
+  if (!M) return;
+  var W = st.clientWidth, H = st.clientHeight, S = 60, G = 4, FLOOR = H - 24;
+  var engine = M.Engine.create(); engine.gravity.y = 1; engine.positionIterations = 10;
+  var wall = { isStatic: true };
+  M.Composite.add(engine.world, [M.Bodies.rectangle(W / 2, FLOOR + 100, W * 3, 200, wall), M.Bodies.rectangle(-100, H / 2, 200, H * 4, wall), M.Bodies.rectangle(W + 100, H / 2, 200, H * 4, wall)]);
+  /* Pirámide 5-4-3-2-1 + remate = 16 */
+  var rows = [5, 4, 3, 2, 1, 1], homes = [];
+  rows.forEach(function (n, r) { for (var k = 0; k < n; k++) homes.push({ x: W / 2 + (k - (n - 1) / 2) * (S + G), y: FLOOR - S / 2 - r * (S + .5) }); });
+  var blocks = R.TECH.map(function (t, i) {
+    var h = homes[i], b = M.Bodies.rectangle(h.x, h.y, S, S, { chamfer: { radius: 12 }, friction: .6, frictionStatic: 1, restitution: .1, density: .003 });
+    b._home = h; b._el = R.el('div', 'chip r4-frost-chip', '<img alt="' + t.name + '" src="' + t.src + '">'); st.appendChild(b._el); return b;
+  });
+  M.Composite.add(engine.world, blocks);
+  var mouse = M.Mouse.create(st); ['mousewheel', 'DOMMouseScroll', 'wheel'].forEach(function (ev) { st.removeEventListener(ev, mouse.mousewheel); });
+  var mc = M.MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: .25, render: { visible: false } } });
+  M.Composite.add(engine.world, mc);
+  var lastTouch = 0, rebuilding = false, ballBody = null, ballEl = null;
+  M.Events.on(mc, 'startdrag', function () { lastTouch = performance.now(); });
+  M.Events.on(mc, 'mousemove', function () { if (mc.body) lastTouch = performance.now(); });
+
+  function standing() { return blocks.filter(function (b) { return Math.hypot(b.position.x - b._home.x, b.position.y - b._home.y) < 16 && Math.abs(b.angle) < .15; }).length; }
+  function rebuild() {
+    if (rebuilding) return; rebuilding = true; status.textContent = 'reconstruyendo…';
+    if (ballBody) { M.Composite.remove(engine.world, ballBody); ballEl.remove(); ballBody = null; }
+    var from = blocks.map(function (b) { M.Body.setStatic(b, true); return { x: b.position.x, y: b.position.y, a: b.angle % (Math.PI * 2) }; });
+    var t0 = performance.now(), dur = R.reduced ? 1 : 1100;
+    (function step(now) {
+      var k = Math.min(1, (now - t0) / dur);
+      blocks.forEach(function (b, i) {
+        var kk = Math.max(0, Math.min(1, (k * 1.6) - i * .035)), e = 1 - Math.pow(1 - kk, 3), f = from[i], h = b._home;
+        var arc = Math.sin(e * Math.PI) * -60;
+        M.Body.setPosition(b, { x: f.x + (h.x - f.x) * e, y: f.y + (h.y - f.y) * e + arc }); M.Body.setAngle(b, f.a * (1 - e));
+      });
+      if (k < 1) requestAnimationFrame(step);
+      else { blocks.forEach(function (b) { M.Body.setStatic(b, false); M.Body.setVelocity(b, { x: 0, y: 0 }); M.Body.setAngularVelocity(b, 0); }); rebuilding = false; lastTouch = 0; }
+    })(t0);
+  }
+  document.getElementById('rebuild').onclick = rebuild;
+  document.getElementById('ball').onclick = function () {
+    if (ballBody) { M.Composite.remove(engine.world, ballBody); ballEl.remove(); }
+    ballBody = M.Bodies.circle(30, FLOOR - 180, 23, { density: .04, restitution: .3, frictionAir: .001 });
+    ballEl = R.el('div', 'ball'); st.appendChild(ballEl);
+    M.Composite.add(engine.world, ballBody); M.Body.setVelocity(ballBody, { x: 22, y: -4 }); lastTouch = performance.now();
+  };
+  var last = performance.now();
+  (function tick(now) {
+    M.Engine.update(engine, Math.min(25, now - last)); last = now;
+    blocks.forEach(function (b) { b._el.style.transform = 'translate(' + (b.position.x - S / 2) + 'px,' + (b.position.y - S / 2) + 'px) rotate(' + b.angle + 'rad)'; });
+    if (ballBody) ballEl.style.transform = 'translate(' + (ballBody.position.x - 23) + 'px,' + (ballBody.position.y - 23) + 'px) rotate(' + ballBody.angle + 'rad)';
+    if (!rebuilding) {
+      var up = standing(); status.textContent = up === 16 ? '16 tecnologías en pie' : up + ' / 16 en pie';
+      if (up < 16 && lastTouch && now - lastTouch > 5000 && !mc.body) rebuild();
+    }
+    requestAnimationFrame(tick);
+  })(last);
+})();
+</script>
+</body>
+</html>

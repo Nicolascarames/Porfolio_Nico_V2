@@ -1,0 +1,105 @@
+<!-- @dsCard group="Dispositivo" height=640 subtitle="La tablet/móvil se amplía a pantalla completa al abrir un proyecto (y vuelve con Esc)" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>DeviceFullscreen — preview</title>
+<style>
+  .df-wrap { padding: 28px; min-height: 640px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .slot { position: relative; }
+  .device { position: relative; border-radius: 34px; padding: 14px; background: linear-gradient(160deg, #2b2c33, #0b0b0e 60%); border: 1px solid rgba(255,255,255,.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 2px rgba(0,0,0,.6), 0 40px 80px -30px #000; }
+  .device.tablet { width: 520px; height: 390px; }
+  .device.phone { width: 210px; height: 420px; border-radius: 40px; padding: 10px; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 22px; overflow: hidden; background: var(--surface); }
+  .device.phone .screen { border-radius: 31px; }
+  .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .screen .idle { position: absolute; inset: 0; display: grid; place-items: center; }
+  .screen .idle img { position: static; width: 46%; height: auto; mix-blend-mode: screen; }
+  .cam { position: absolute; top: 5px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #1d1e24; box-shadow: inset 0 0 2px #000; }
+  .device.phone .cam { top: 16px; width: 60px; height: 18px; margin-left: -30px; border-radius: 99px; background: #000; z-index: 2; }
+  /* Estado pantalla completa (lo pone el JS tras medir) */
+  .device.is-full { position: fixed; z-index: 1000; margin: 0; }
+  .device.is-full .cam { opacity: 0; transition: opacity var(--duration-fast); }
+  .veil { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.55); -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay)); opacity: 0; pointer-events: none; transition: opacity var(--duration-slow) var(--ease-liquid); }
+  .veil.on { opacity: 1; pointer-events: auto; }
+  .hud { position: fixed; z-index: 1001; top: 14px; left: 50%; transform: translate(-50%, -20px); display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 16px; border-radius: var(--radius-pill);
+    opacity: 0; pointer-events: none; transition: opacity var(--duration-base), transform var(--duration-base) var(--ease-spring); background: rgba(10,10,12,.6); }
+  .hud.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .hud b { font: 600 14px var(--font-display); }
+  .hud kbd { font: 500 11px var(--font-mono); color: var(--ink-faint); border: 1px solid var(--glass-edge); border-radius: 6px; padding: 2px 6px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; }
+  .seg { display: inline-flex; padding: 4px; border-radius: var(--radius-pill); gap: 4px; }
+  .seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: var(--radius-pill); font: 600 13px var(--font-display); color: var(--ink-muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--frost-100); color: var(--on-frost); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .chips button { padding: 8px 14px; font-size: 13px; }
+  .check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-muted); cursor: pointer; }
+  .check input { accent-color: var(--frost-100); }
+</style></head>
+<body>
+<div id="root" class="r4-stage df-wrap">
+  <div class="slot" id="slot">
+    <div class="device tablet" id="device" tabindex="0" aria-label="Tablet: doble clic para pantalla completa">
+      <span class="cam"></span>
+      <div class="screen" id="screen"><div class="idle"><img src="../../assets/logo-404-horizontal.png" alt="404"></div></div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="seg r4-glass" role="group" aria-label="Dispositivo"><button id="tab" aria-pressed="true">Tablet</button><button id="pho" aria-pressed="false">Móvil</button></div>
+    <button class="r4-btn" id="full">&#x26F6; Pantalla completa</button>
+    <label class="check"><input type="checkbox" id="auto" checked> Ampliar al abrir un proyecto</label>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="veil" id="veil"></div>
+  <div class="hud r4-glass" id="hud" role="dialog" aria-label="Pantalla completa"><b id="hudTitle">reality404</b><kbd>Esc</kbd><button class="r4-btn-ghost" id="exit" style="padding:8px 14px;font-size:13px">Salir &#x2715;</button></div>
+</div>
+<script>
+(function () {
+  var R = window.R4, dev = document.getElementById('device'), slot = document.getElementById('slot'), screen = document.getElementById('screen'), veil = document.getElementById('veil'), hud = document.getElementById('hud');
+  var full = false, busy = false, DUR = R.reduced ? 1 : 640, EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  function rect(el) { var r = el.getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; }
+  function frame(r, pad, rad) { return { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', padding: pad + 'px', borderRadius: rad + 'px' }; }
+  function base() { var phone = dev.classList.contains('phone'); return { pad: phone ? 10 : 14, rad: phone ? 40 : 34, inner: phone ? 31 : 22 }; }
+
+  function expand() {
+    if (full || busy) return; busy = true; full = true;
+    var b = base(), from = rect(dev), to = { left: 0, top: 0, width: innerWidth, height: innerHeight };
+    slot.style.width = from.width + 'px'; slot.style.height = from.height + 'px'; // reserva el hueco
+    dev.classList.add('is-full'); Object.assign(dev.style, frame(to, 0, 0));
+    veil.classList.add('on'); hud.classList.add('on');
+    var a = dev.animate([frame(from, b.pad, b.rad), frame(to, 0, 0)], { duration: DUR, easing: EASE });
+    screen.animate([{ borderRadius: b.inner + 'px' }, { borderRadius: '0px' }], { duration: DUR, easing: EASE, fill: 'forwards' });
+    a.onfinish = function () { busy = false; document.getElementById('exit').focus({ preventScroll: true });
+      // En el sitio real, opcional: dev.requestFullscreen?.() para ocultar también la UI del navegador
+    };
+  }
+  function collapse() {
+    if (!full || busy) return; busy = true;
+    var b = base(), from = rect(dev), to = rect(slot);
+    veil.classList.remove('on'); hud.classList.remove('on');
+    var a = dev.animate([frame(from, 0, 0), frame(to, b.pad, b.rad)], { duration: DUR * .85, easing: EASE });
+    screen.animate([{ borderRadius: '0px' }, { borderRadius: b.inner + 'px' }], { duration: DUR * .85, easing: EASE, fill: 'forwards' });
+    a.onfinish = function () { dev.classList.remove('is-full'); dev.removeAttribute('style'); slot.removeAttribute('style'); full = false; busy = false; dev.focus({ preventScroll: true }); };
+  }
+  function show(p) {
+    screen.innerHTML = p.img ? '<img alt="" src="' + p.img + '">' : '<div class="idle"><img src="../../assets/logo-404-horizontal.png" alt=""></div>';
+    document.getElementById('hudTitle').textContent = p.title;
+  }
+  function setDevice(phone) {
+    if (full) return;
+    var from = rect(dev); dev.classList.toggle('phone', phone); dev.classList.toggle('tablet', !phone);
+    var to = rect(dev); dev.animate([{ width: from.width + 'px', height: from.height + 'px' }, { width: to.width + 'px', height: to.height + 'px' }], { duration: DUR * .7, easing: EASE });
+    document.getElementById('tab').setAttribute('aria-pressed', !phone); document.getElementById('pho').setAttribute('aria-pressed', phone);
+  }
+  R.PROJECTS.forEach(function (p) { var c = R.el('button', 'r4-btn-ghost', p.title); c.onclick = function () { show(p); if (document.getElementById('auto').checked) setTimeout(expand, 120); }; document.getElementById('chips').appendChild(c); });
+  document.getElementById('full').onclick = expand;
+  document.getElementById('exit').onclick = collapse;
+  veil.onclick = collapse;
+  dev.addEventListener('dblclick', function () { full ? collapse() : expand(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') collapse(); if (e.key === 'Enter' && document.activeElement === dev) expand(); });
+  document.getElementById('tab').onclick = function () { setDevice(false); };
+  document.getElementById('pho').onclick = function () { setDevice(true); };
+  addEventListener('resize', function () { if (full && !busy) Object.assign(dev.style, frame({ left: 0, top: 0, width: innerWidth, height: innerHeight }, 0, 0)); });
+})();
+</script>
+</body>
+</html>

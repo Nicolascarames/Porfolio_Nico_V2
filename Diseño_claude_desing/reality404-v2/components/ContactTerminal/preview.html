@@ -1,0 +1,72 @@
+<!-- @dsCard group="Contacto" height=560 subtitle="Terminal 404: 'mensaje no encontrado… escríbelo tú' con prompts de consola" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>ContactTerminal — preview</title>
+<style>
+  .ct-wrap { padding: 32px; min-height: 560px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 32px; align-items: center; }
+  .big404 { font: 700 150px/0.85 var(--font-display); letter-spacing: -.06em; }
+  .side p { color: var(--ink-muted); font-size: 16px; line-height: 1.6; margin: 18px 0 0; max-width: 300px; }
+  .term { border-radius: var(--radius-xl); overflow: hidden; }
+  .bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--glass-edge); }
+  .bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--frost-400); }
+  .bar span { margin-left: 10px; font: 500 12px var(--font-mono); color: var(--ink-faint); }
+  .out { height: 360px; overflow-y: auto; padding: 18px 20px; font: 400 14px/1.75 var(--font-mono); color: var(--ink-muted); cursor: text; }
+  .hi { color: var(--ink); } .ps { color: var(--frost-200); } .ok { color: var(--signal-live); } .err { color: var(--signal-error); }
+  .glitch { color: var(--frost-100); text-shadow: 0 0 10px rgba(223,225,236,.5); }
+  .line { display: flex; gap: 8px; } .line input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: var(--ink); font: inherit; caret-color: var(--frost-100); }
+  .bar2 { height: 6px; border-radius: 99px; background: var(--glass); overflow: hidden; margin: 6px 0; width: 260px; }
+  .bar2 i { display: block; height: 100%; width: 0; background: var(--frost-100); box-shadow: 0 0 10px var(--frost-100); transition: width 1.2s var(--ease-liquid); }
+</style></head>
+<body>
+<div id="root" class="r4-stage ct-wrap">
+  <div class="side">
+    <div class="r4-eyebrow">Contacto</div>
+    <img src="../../assets/logo-404-horizontal.png" alt="404" style="display:block;width:100%;max-width:340px;margin:10px 0 0 -14px;mix-blend-mode:screen">
+    <h2 class="r4-title" style="font-size:30px;margin-top:14px">Mensaje no encontrado.</h2>
+    <p>Todavía no me has escrito. Arréglalo desde la terminal: tres preguntas y listo.</p>
+  </div>
+  <div class="term r4-glass" style="background:rgba(10,10,12,.6)">
+    <div class="bar"><i></i><i></i><i></i><span>nico@reality404: ~/contacto</span></div>
+    <div class="out" id="out" aria-live="polite"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var R = window.R4, out = document.getElementById('out'), data = {};
+  var Q = [
+    { key: 'name', label: 'nombre', check: function (v) { return v.length > 1; }, err: 'necesito al menos 2 caracteres' },
+    { key: 'email', label: 'email', check: function (v) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }, err: 'formato de email inválido' },
+    { key: 'message', label: 'mensaje', check: function (v) { return v.length > 2; }, err: 'el mensaje está vacío' }
+  ];
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function print(h, cls) { var d = R.el('div', cls || '', h); out.appendChild(d); out.scrollTop = out.scrollHeight; return d; }
+  function prompt(label, cb) {
+    var l = print('<span class="ps">' + label + ' ›</span><input aria-label="' + label + '" autocomplete="off" spellcheck="false">', 'line'), i = l.querySelector('input');
+    i.focus({ preventScroll: true });
+    i.addEventListener('keydown', function (e) { if (e.key !== 'Enter') return; var v = i.value.trim(); l.innerHTML = '<span class="ps">' + label + ' ›</span> <span class="hi">' + esc(v) + '</span>'; cb(v); });
+  }
+  out.addEventListener('click', function () { var i = out.querySelector('input'); i && i.focus(); });
+  function ask(k) {
+    if (k >= Q.length) return confirm();
+    var q = Q[k]; prompt(q.label, function (v) { if (!q.check(v)) { print('<span class="err">✕ ' + q.err + '</span>'); return ask(k); } data[q.key] = v; ask(k + 1); });
+  }
+  function confirm() {
+    print('&nbsp;'); print('enviar mensaje a nico? <span class="hi">[s/n]</span>');
+    prompt('', function (v) {
+      if (/^s/i.test(v)) {
+        print('<span class="glitch">POST /api/contact</span>'); var b = print('<div class="bar2"><i></i></div>');
+        requestAnimationFrame(function () { b.querySelector('i').style.width = '100%'; });
+        // En el sitio real: fetch('/api/contact', { method: 'POST', body: JSON.stringify(data) })
+        setTimeout(function () { print('<span class="ok">200 OK</span> · mensaje encontrado. gracias, ' + esc(data.name) + ' — te respondo a ' + esc(data.email)); print('escribe <span class="hi">otra</span> para enviar otro'); prompt('$', function (w) { if (w === 'otra') { out.innerHTML = ''; boot(); } }); }, R.reduced ? 0 : 1300);
+      } else { print('cancelado. empecemos de nuevo.'); ask(0); }
+    });
+  }
+  function boot() {
+    var lines = ['<span class="err">GET /mensaje → 404 Not Found</span>', 'nadie ha escrito aún. vamos a crearlo:', '&nbsp;'], i = 0;
+    (function n() { if (i < lines.length) { print(lines[i++]); setTimeout(n, R.reduced ? 0 : 380); } else ask(0); })();
+  }
+  new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { o.disconnect(); boot(); } }).observe(out);
+})();
+</script>
+</body>
+</html>

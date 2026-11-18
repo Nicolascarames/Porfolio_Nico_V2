@@ -1,0 +1,84 @@
+<!-- @dsCard group="Proyectos" height=620 subtitle="Coverflow 3D: arrastra, rueda o flechas; la central reproduce su vídeo" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>ProjectCoverflow — preview</title>
+<style>
+  .cf-wrap { padding: 24px 0 28px; display: flex; flex-direction: column; gap: 18px; min-height: 620px; }
+  .cf { position: relative; height: 330px; perspective: 1100px; cursor: grab; touch-action: pan-y; user-select: none; outline: none; }
+  .cf.dragging { cursor: grabbing; }
+  .cf-card { position: absolute; left: 50%; top: 20px; width: 380px; aspect-ratio: 3/2; margin-left: -190px; border-radius: var(--radius-lg); overflow: hidden;
+    transform-style: preserve-3d; will-change: transform; -webkit-box-reflect: below 10px linear-gradient(transparent 70%, rgba(255,255,255,.12)); }
+  .cf-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.92), rgba(0,0,0,.25) 55%, transparent); }
+  .cf-card .meta { position: absolute; left: 20px; right: 20px; bottom: 18px; }
+  .cf-card h3 { margin: 0; font: 600 22px/1.2 var(--font-display); }
+  .cf-card p { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cf-card .open { position: absolute; top: 14px; right: 14px; opacity: 0; transform: translateY(-4px); transition: opacity var(--duration-fast), transform var(--duration-fast); }
+  .cf-card.is-center .open { opacity: 1; transform: none; }
+  .cf-title { text-align: center; }
+  .cf-title .r4-title { font-size: 28px; }
+</style></head>
+<body>
+<div id="root" class="r4-stage cf-wrap">
+  <div id="tablet"></div>
+  <div class="cf" id="cf" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Proyectos"></div>
+  <div class="r4-hint" id="live" aria-live="polite">Arrastra, usa la rueda o ← → · clic en la central para abrirla en la tablet</div>
+</div>
+<script>
+(function () {
+  var R = window.R4, P = R.PROJECTS, cf = document.getElementById('cf'), live = document.getElementById('live');
+  var tablet = R.miniTablet(document.getElementById('tablet'));
+  var pos = 0, target = 0, N = P.length, center = -1;
+  var cards = P.map(function (p, i) {
+    var c = R.el('div', 'cf-card r4-glass');
+    c._m = R.media(p, c);
+    c.appendChild(R.el('div', 'shade'));
+    c.appendChild(R.el('div', 'meta', '<h3>' + p.title + '</h3><p>' + p.desc + '</p>'));
+    var b = R.el('button', 'r4-btn open', 'Abrir en tablet'); b.style.cssText = 'padding:8px 14px;font-size:12px'; c.appendChild(b);
+    cf.appendChild(c); return c;
+  });
+  function wrap(d) { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; } // distancia circular
+  function render() {
+    pos += (target - pos) * (R.reduced ? 1 : .14);
+    if (Math.abs(target - pos) < .001) pos = target;
+    cards.forEach(function (c, i) {
+      var d = wrap(i - pos), a = Math.abs(d);
+      var rot = Math.max(-1, Math.min(1, d)) * -48, x = d * 210 - Math.sign(d) * Math.max(0, a - 1) * 70, z = -a * 160;
+      c.style.transform = 'translateX(' + x + 'px) translateZ(' + z + 'px) rotateY(' + rot + 'deg) scale(' + (a < .5 ? 1.06 - a * .12 : 1) + ')';
+      c.style.zIndex = 100 - Math.round(a * 10);
+      c.style.opacity = a > 2.4 ? 0 : 1;
+      c.style.filter = 'brightness(' + Math.max(.35, 1 - a * .35) + ')';
+    });
+    var ci = ((Math.round(pos) % N) + N) % N;
+    if (ci !== center) {
+      if (center >= 0) { cards[center].classList.remove('is-center'); cards[center]._m.pause(); }
+      center = ci; cards[ci].classList.add('is-center'); cards[ci]._m.play(); live.textContent = P[ci].title + ' — clic para abrir en la tablet';
+    }
+    requestAnimationFrame(render);
+  }
+  /* Arrastre con inercia */
+  var sx, start, moved, vx = 0, lastX, lastT;
+  cf.addEventListener('pointerdown', function (e) { sx = lastX = e.clientX; lastT = performance.now(); start = target; moved = false; cf.setPointerCapture(e.pointerId); cf.classList.add('dragging'); });
+  cf.addEventListener('pointermove', function (e) {
+    if (sx == null) return; var dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true;
+    var now = performance.now(); vx = (e.clientX - lastX) / Math.max(1, now - lastT); lastX = e.clientX; lastT = now;
+    target = start - dx / 210;
+  });
+  cf.addEventListener('pointerup', function (e) {
+    cf.classList.remove('dragging'); var wasDrag = moved; sx = null;
+    if (wasDrag) { target = Math.round(target - vx * 3); return; }
+    var c = document.elementsFromPoint(e.clientX, e.clientY).find(function (n) { return n.classList && n.classList.contains('cf-card'); });
+    if (!c) return; var i = cards.indexOf(c);
+    if (i === center) R.flyTo(c, tablet.screen, function () { tablet.show(P[i]); });
+    else target = Math.round(pos) + wrap(i - pos);
+  });
+  cf.addEventListener('wheel', function (e) { e.preventDefault(); target = Math.round(target + Math.sign(e.deltaY || e.deltaX)); }, { passive: false });
+  cf.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') target = Math.round(target) + 1;
+    if (e.key === 'ArrowLeft') target = Math.round(target) - 1;
+    if (e.key === 'Enter') R.flyTo(cards[center], tablet.screen, function () { tablet.show(P[center]); });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

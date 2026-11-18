@@ -1,0 +1,96 @@
+<!-- @dsCard group="Contacto" height=620 subtitle="Chat conversacional: el formulario se rellena pregunta a pregunta" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>ContactChat — preview</title>
+<style>
+  .cc-wrap { padding: 32px 24px; min-height: 620px; display: grid; place-items: center; }
+  .chat { width: min(520px, 100%); height: 540px; border-radius: var(--radius-xl); display: flex; flex-direction: column; overflow: hidden; }
+  .top { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--glass-edge); }
+  .av { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 1px solid var(--glass-edge); position: relative; }
+  .av img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .top b { font: 600 15px var(--font-display); display: block; }
+  .top small { font-size: 12px; color: var(--ink-muted); display: inline-flex; align-items: center; gap: 6px; }
+  .top small::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--signal-live); }
+  .top .prog { margin-left: auto; display: flex; gap: 4px; }
+  .top .prog i { width: 18px; height: 4px; border-radius: 99px; background: var(--frost-400); transition: background var(--duration-base); }
+  .top .prog i.on { background: var(--frost-100); box-shadow: 0 0 8px rgba(223,225,236,.6); }
+  .log { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+  .msg { max-width: 78%; padding: 11px 15px; border-radius: 18px; font-size: 14.5px; line-height: 1.5; animation: pop var(--duration-base) var(--ease-spring); }
+  .bot { align-self: flex-start; background: var(--glass-strong); border: 1px solid var(--glass-edge); border-bottom-left-radius: 6px; }
+  .me { align-self: flex-end; background: var(--frost-100); color: var(--on-frost); border-bottom-right-radius: 6px; box-shadow: 0 0 20px rgba(223,225,236,.15); }
+  .me button { all: unset; cursor: pointer; font-size: 11px; opacity: .6; margin-left: 8px; text-decoration: underline; }
+  .typing { display: inline-flex; gap: 4px; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-muted); animation: bounce 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: none; opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+  @keyframes pop { from { transform: translateY(8px) scale(.96); opacity: 0; } }
+  .summary { font-size: 13px; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin-top: 8px; }
+  .summary dt { color: var(--ink-faint); font: 500 11px var(--font-mono); padding-top: 2px; }
+  .summary dd { margin: 0; word-break: break-word; }
+  .quick { display: flex; gap: 8px; padding: 0 18px 10px; flex-wrap: wrap; }
+  .bar { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--glass-edge); }
+  .bar input, .bar textarea { flex: 1; padding: 12px 16px; border-radius: var(--radius-pill); background: rgba(10,10,10,.7); border: 1px solid rgba(255,255,255,.1); color: var(--ink); font-size: 14.5px; outline: none; resize: none; height: 46px; }
+  .bar input:focus { border-color: var(--frost-200); }
+  .bar .r4-btn { width: 46px; height: 46px; padding: 0; border-radius: 50%; font-size: 18px; }
+  .hint-err { color: var(--signal-error); }
+</style></head>
+<body>
+<div id="root" class="r4-stage cc-wrap">
+  <div class="chat r4-glass" style="background:rgba(10,10,12,.55)">
+    <div class="top"><div class="av"><img src="../../assets/nico-700.webp" alt=""></div><div><b>Nico</b><small>Disponible para proyectos</small></div><div class="prog" id="prog"><i></i><i></i><i></i></div></div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="quick" id="quick"></div>
+    <form class="bar" id="bar"><input id="in" autocomplete="off" aria-label="Tu respuesta" placeholder="Escribe aquí…"><button class="r4-btn" aria-label="Enviar">&#8593;</button></form>
+  </div>
+</div>
+<script>
+(function () {
+  var R = window.R4, log = document.getElementById('log'), bar = document.getElementById('bar'), inp = document.getElementById('in'), quick = document.getElementById('quick'), prog = document.getElementById('prog').children;
+  var data = {}, step = 0;
+  var STEPS = [
+    { key: 'name', ask: '¡Hola! Soy Nico. ¿Cómo te llamas?', ph: 'Tu nombre', check: function (v) { return v.length > 1 || 'Dime al menos un nombre corto.'; } },
+    { key: 'email', ask: function () { return 'Encantado, ' + data.name + '. ¿A qué email te respondo?'; }, ph: 'tucorreo@ejemplo.com', type: 'email', check: function (v) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Ese email no parece válido, ¿lo revisas?'; } },
+    { key: 'message', ask: '¿Qué tienes en mente? Cuéntame tu idea o proyecto.', ph: 'Tu mensaje…', quick: ['Una web', 'Una app con IA', 'Automatizar un flujo', 'Solo saludar'], check: function (v) { return v.length > 2 || 'Cuéntame un poco más.'; } }
+  ];
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function add(html, who) { var m = R.el('div', 'msg ' + who, html); log.appendChild(m); log.scrollTop = log.scrollHeight; return m; }
+  function botSay(html, cb) {
+    var t = add('<span class="typing"><i></i><i></i><i></i></span>', 'bot');
+    setTimeout(function () { t.innerHTML = html; log.scrollTop = log.scrollHeight; cb && cb(); }, R.reduced ? 0 : 700);
+  }
+  function ask() {
+    [].forEach.call(prog, function (p, i) { p.classList.toggle('on', i < step); });
+    quick.innerHTML = '';
+    if (step >= STEPS.length) return review();
+    var s = STEPS[step]; inp.type = s.type || 'text'; inp.placeholder = s.ph; inp.disabled = false;
+    botSay(typeof s.ask === 'function' ? s.ask() : s.ask, function () {
+      (s.quick || []).forEach(function (q) { var b = R.el('button', 'r4-btn-ghost', q); b.type = 'button'; b.style.cssText = 'padding:8px 14px;font-size:13px'; b.onclick = function () { inp.value = q; bar.requestSubmit(); }; quick.appendChild(b); });
+      inp.focus({ preventScroll: true });
+    });
+  }
+  function review() {
+    inp.disabled = true; inp.placeholder = '';
+    botSay('Perfecto, esto es lo que me llega:<dl class="summary"><dt>NOMBRE</dt><dd>' + esc(data.name) + '</dd><dt>EMAIL</dt><dd>' + esc(data.email) + '</dd><dt>MENSAJE</dt><dd>' + esc(data.message) + '</dd></dl>', function () {
+      var send = R.el('button', 'r4-btn', 'Enviar'); send.type = 'button'; send.style.cssText = 'padding:9px 18px;font-size:13px';
+      var edit = R.el('button', 'r4-btn-ghost', 'Empezar de nuevo'); edit.type = 'button'; edit.style.cssText = 'padding:8px 14px;font-size:13px';
+      quick.appendChild(send); quick.appendChild(edit);
+      send.onclick = function () { quick.innerHTML = ''; add('Enviar', 'me');
+        // En el sitio real: fetch('/api/contact', { method: 'POST', body: JSON.stringify(data) })
+        botSay('¡Recibido! Te escribo muy pronto a <b>' + esc(data.email) + '</b>.'); };
+      edit.onclick = function () { log.innerHTML = ''; data = {}; step = 0; ask(); };
+    });
+  }
+  bar.addEventListener('submit', function (e) {
+    e.preventDefault(); if (step >= STEPS.length) return;
+    var v = inp.value.trim(), s = STEPS[step], ok = s.check(v);
+    if (ok !== true) { botSay('<span class="hint-err">' + ok + '</span>'); return; }
+    data[s.key] = v; inp.value = ''; inp.disabled = true;
+    var me = add(esc(v), 'me'); var k = step;
+    var ed = R.el('button', '', 'editar'); ed.type = 'button'; ed.onclick = function () { step = k; inp.value = data[s.key]; inp.disabled = false; inp.focus(); }; me.appendChild(ed);
+    step++; setTimeout(ask, 250);
+  });
+  new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { o.disconnect(); ask(); } }).observe(log);
+})();
+</script>
+</body>
+</html>

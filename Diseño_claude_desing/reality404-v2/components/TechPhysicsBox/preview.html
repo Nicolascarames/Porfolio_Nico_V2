@@ -1,0 +1,73 @@
+<!-- @dsCard group="Tecnologías" height=520 subtitle="Caja con física: las fichas caen, se apilan, se cogen y se lanzan" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>TechPhysicsBox — preview</title>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<style>
+  .tp-wrap { padding: 24px; min-height: 520px; display: flex; flex-direction: column; gap: 14px; }
+  .tp-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+  .box { position: relative; height: 380px; border-radius: var(--radius-xl); overflow: hidden; cursor: grab; touch-action: none; }
+  .box:active { cursor: grabbing; }
+  .box::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,.07), transparent 30%); }
+  .chip { position: absolute; left: 0; top: 0; width: 64px; height: 64px; border-radius: var(--radius-md); display: grid; place-items: center; pointer-events: none; will-change: transform; }
+  .chip img { width: 58%; height: 58%; object-fit: contain; pointer-events: none; }
+  .chip span { position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 11px var(--font-display); color: var(--ink); opacity: 0; transition: opacity var(--duration-fast); }
+  .chip.hot { box-shadow: inset 0 1px 0 #fff, 0 0 0 2px var(--frost-100), 0 0 30px rgba(223,225,236,.45); }
+  .chip.hot span { opacity: 1; }
+</style></head>
+<body>
+<div id="root" class="r4-stage tp-wrap">
+  <div class="tp-head">
+    <div><div class="r4-eyebrow">Stack</div><h2 class="r4-title" style="font-size:30px;margin-top:6px">Tecnologías</h2></div>
+    <div style="display:flex;gap:8px"><button class="r4-btn-ghost" id="shake">Agitar caja</button><button class="r4-btn-ghost" id="flip">Invertir gravedad</button></div>
+  </div>
+  <div class="box r4-glass" id="box" aria-label="Caja interactiva con las tecnologías que uso"></div>
+  <ul class="r4-sr" id="list"></ul>
+  <div class="r4-hint">Coge una ficha y lánzala contra las demás</div>
+</div>
+<script>
+(function () {
+  var R = window.R4, M = window.Matter, box = document.getElementById('box');
+  R.TECH.forEach(function (t) { document.getElementById('list').appendChild(R.el('li', '', t.name)); });
+  if (!M) { box.innerHTML = '<p class="r4-hint" style="padding:40px">No se pudo cargar el motor de física.</p>'; return; }
+  var W = box.clientWidth, H = box.clientHeight, S = 64;
+  var engine = M.Engine.create(); engine.gravity.y = 1;
+  var wallOpt = { isStatic: true, render: { visible: false } }, T = 200;
+  M.Composite.add(engine.world, [
+    M.Bodies.rectangle(W / 2, H + T / 2, W * 3, T, wallOpt),
+    M.Bodies.rectangle(-T / 2, 0, T, H * 6, wallOpt), M.Bodies.rectangle(W + T / 2, 0, T, H * 6, wallOpt)
+  ]);
+  var items = R.TECH.map(function (t, i) {
+    var b = M.Bodies.rectangle(60 + (i * 97) % (W - 120), -80 - i * 70, S, S, { chamfer: { radius: 16 }, restitution: .45, friction: .08, frictionAir: .012, density: .002 });
+    var d = R.el('div', 'chip r4-frost-chip', '<img alt="" src="' + t.src + '"><span>' + t.name + '</span>');
+    box.appendChild(d); b._el = d; return b;
+  });
+  /* Caen al entrar en pantalla */
+  var dropped = false;
+  function drop() { if (dropped) return; dropped = true; items.forEach(function (b, i) { M.Body.setPosition(b, { x: 60 + (i * 97) % (W - 120), y: -60 - i * 45 }); M.Composite.add(engine.world, b); });
+    setTimeout(function () { M.Composite.add(engine.world, M.Bodies.rectangle(W / 2, -T / 2, W * 3, T, wallOpt)); }, 3200); }
+  new IntersectionObserver(function (es) { if (es[0].isIntersecting) drop(); }, { threshold: .3 }).observe(box);
+  setTimeout(drop, 600);
+
+  var mouse = M.Mouse.create(box);
+  mouse.element.removeEventListener('mousewheel', mouse.mousewheel); mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel); mouse.element.removeEventListener('wheel', mouse.mousewheel);
+  var mc = M.MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: .2, damping: .1, render: { visible: false } } });
+  M.Composite.add(engine.world, mc);
+  var hot = null;
+  M.Events.on(mc, 'startdrag', function (e) { hot = e.body; hot._el && hot._el.classList.add('hot'); });
+  M.Events.on(mc, 'enddrag', function (e) { e.body._el && e.body._el.classList.remove('hot'); hot = null; });
+
+  document.getElementById('shake').onclick = function () { items.forEach(function (b) { M.Body.setVelocity(b, { x: (Math.random() - .5) * 26, y: -10 - Math.random() * 16 }); M.Body.setAngularVelocity(b, (Math.random() - .5) * .5); }); };
+  document.getElementById('flip').onclick = function () { engine.gravity.y *= -1; };
+
+  var last = performance.now();
+  (function tick(now) {
+    M.Engine.update(engine, Math.min(32, now - last)); last = now;
+    for (var i = 0; i < items.length; i++) { var b = items[i]; b._el.style.transform = 'translate(' + (b.position.x - S / 2) + 'px,' + (b.position.y - S / 2) + 'px) rotate(' + b.angle + 'rad)'; }
+    requestAnimationFrame(tick);
+  })(last);
+})();
+</script>
+</body>
+</html>

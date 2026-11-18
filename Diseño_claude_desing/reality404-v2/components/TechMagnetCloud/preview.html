@@ -1,0 +1,89 @@
+<!-- @dsCard group="Tecnologías" height=500 subtitle="Nube magnética: los iconos flotan y huyen (o se pegan) al cursor; arrastrables" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>TechMagnetCloud — preview</title>
+<style>
+  .mc-wrap { padding: 24px; min-height: 500px; display: flex; flex-direction: column; gap: 14px; }
+  .mc-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+  .seg { display: inline-flex; padding: 4px; border-radius: var(--radius-pill); gap: 4px; }
+  .seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: var(--radius-pill); font: 600 13px var(--font-display); color: var(--ink-muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--frost-100); color: var(--on-frost); }
+  .cloud { position: relative; height: 360px; border-radius: var(--radius-xl); overflow: hidden; touch-action: none; }
+  .cloud canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .chip { position: absolute; left: 0; top: 0; width: 58px; height: 58px; border-radius: var(--radius-md); display: grid; place-items: center; cursor: grab; will-change: transform; border: 0; padding: 0; }
+  .chip img { width: 58%; height: 58%; object-fit: contain; pointer-events: none; }
+  .chip.drag { cursor: grabbing; box-shadow: inset 0 1px 0 #fff, 0 0 0 2px var(--frost-100), 0 0 30px rgba(223,225,236,.5); z-index: 5; }
+  .tip { position: absolute; pointer-events: none; padding: 6px 10px; border-radius: var(--radius-pill); font: 600 12px var(--font-display); background: var(--surface-raised); border: 1px solid var(--glass-edge); opacity: 0; transition: opacity var(--duration-fast); white-space: nowrap; }
+</style></head>
+<body>
+<div id="root" class="r4-stage mc-wrap">
+  <div class="mc-head">
+    <div><div class="r4-eyebrow">Stack</div><h2 class="r4-title" style="font-size:30px;margin-top:6px">Tecnologías</h2></div>
+    <div class="seg r4-glass" role="group" aria-label="Modo del imán">
+      <button id="repel" aria-pressed="true">Repeler</button><button id="attract" aria-pressed="false">Atraer</button>
+    </div>
+  </div>
+  <div class="cloud r4-glass" id="cloud"><canvas id="cv"></canvas><div class="tip" id="tip"></div></div>
+  <div class="r4-hint">Mueve el ratón por la caja · arrastra un icono y suéltalo</div>
+</div>
+<script>
+(function () {
+  var R = window.R4, cloud = document.getElementById('cloud'), cv = document.getElementById('cv'), ctx = cv.getContext('2d'), tip = document.getElementById('tip');
+  var W = cloud.clientWidth, H = cloud.clientHeight, S = 58, mode = 1, dpr = window.devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+  var cols = 6, rows = Math.ceil(R.TECH.length / cols);
+  var nodes = R.TECH.map(function (t, i) {
+    var hx = (i % cols + .5 + (Math.floor(i / cols) % 2 ? .25 : -.25)) * W / cols, hy = (Math.floor(i / cols) + .5) * H / rows;
+    var d = R.el('button', 'chip r4-frost-chip', '<img alt="" src="' + t.src + '">'); d.setAttribute('aria-label', t.name);
+    cloud.appendChild(d);
+    var n = { t: t, el: d, hx: hx, hy: hy, x: W / 2, y: H / 2, vx: 0, vy: 0, ph: Math.random() * 6.28, drag: false };
+    d.addEventListener('pointerdown', function (e) { n.drag = true; d.classList.add('drag'); d.setPointerCapture(e.pointerId); });
+    d.addEventListener('pointerup', function () { n.drag = false; d.classList.remove('drag'); n.vx += (Math.random() - .5) * 4; });
+    d.addEventListener('pointerenter', function () { tip.textContent = t.name; tip.style.opacity = 1; n.hot = true; });
+    d.addEventListener('pointerleave', function () { tip.style.opacity = 0; n.hot = false; });
+    d.addEventListener('focus', function () { tip.textContent = t.name; tip.style.opacity = 1; n.hot = true; });
+    d.addEventListener('blur', function () { tip.style.opacity = 0; n.hot = false; });
+    return n;
+  });
+  var mx = -999, my = -999;
+  cloud.addEventListener('pointermove', function (e) { var r = cloud.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top;
+    nodes.forEach(function (n) { if (n.drag) { n.x = mx; n.y = my; n.vx = n.vy = 0; } }); });
+  cloud.addEventListener('pointerleave', function () { mx = my = -999; });
+  function setMode(m) { mode = m; document.getElementById('repel').setAttribute('aria-pressed', m === 1); document.getElementById('attract').setAttribute('aria-pressed', m === -1); }
+  document.getElementById('repel').onclick = function () { setMode(1); };
+  document.getElementById('attract').onclick = function () { setMode(-1); };
+
+  (function tick(now) {
+    var tt = now / 1000;
+    nodes.forEach(function (n) {
+      if (n.drag) return;
+      var fx = n.hx + Math.sin(tt * .7 + n.ph) * 10 - n.x, fy = n.hy + Math.cos(tt * .9 + n.ph) * 8 - n.y;
+      n.vx += fx * .02; n.vy += fy * .02;
+      var dx = n.x - mx, dy = n.y - my, d2 = dx * dx + dy * dy, R2 = 140 * 140;
+      if (d2 < R2 && !R.reduced) { var d = Math.sqrt(d2) || 1, f = (1 - d / 140) * 3.2 * mode; n.vx += dx / d * f * (mode < 0 ? .6 : 1); n.vy += dy / d * f * (mode < 0 ? .6 : 1); }
+      n.vx *= .86; n.vy *= .86; n.x += n.vx; n.y += n.vy;
+      n.x = Math.max(S / 2, Math.min(W - S / 2, n.x)); n.y = Math.max(S / 2, Math.min(H - S / 2, n.y));
+    });
+    /* colisiones suaves entre fichas */
+    for (var i = 0; i < nodes.length; i++) for (var j = i + 1; j < nodes.length; j++) {
+      var a = nodes[i], b = nodes[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1, min = S + 6;
+      if (d < min) { var p = (min - d) / 2, ux = dx / d, uy = dy / d; if (!a.drag) { a.x -= ux * p; a.y -= uy * p; } if (!b.drag) { b.x += ux * p; b.y += uy * p; } }
+    }
+    ctx.clearRect(0, 0, W, H);
+    /* hilos de luz entre vecinos, como los tubos del fondo */
+    ctx.lineWidth = 1;
+    for (i = 0; i < nodes.length; i++) for (j = i + 1; j < nodes.length; j++) {
+      a = nodes[i]; b = nodes[j]; d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < 150) { ctx.strokeStyle = 'rgba(223,225,236,' + (1 - d / 150) * .35 + ')'; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    }
+    nodes.forEach(function (n) {
+      var s = n.hot || n.drag ? 1.15 : 1;
+      n.el.style.transform = 'translate(' + (n.x - S / 2) + 'px,' + (n.y - S / 2) + 'px) scale(' + s + ') rotate(' + n.vx * 2 + 'deg)';
+      if (n.hot) { tip.style.left = n.x - tip.offsetWidth / 2 + 'px'; tip.style.top = n.y - S / 2 - 36 + 'px'; }
+    });
+    requestAnimationFrame(tick);
+  })(performance.now());
+})();
+</script>
+</body>
+</html>

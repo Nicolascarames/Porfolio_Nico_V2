@@ -1,0 +1,77 @@
+<!-- @dsCard group="Sobre mí" height=600 subtitle="Bento de vidrio: foto con tilt, bio, hora local en A Coruña, contadores y stack" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>AboutBento — preview</title>
+<style>
+  .bb-wrap { padding: 28px; min-height: 600px; }
+  .grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr 1fr; grid-template-rows: 150px 150px 160px; gap: 14px; margin-top: 18px; }
+  .cell { position: relative; border-radius: var(--radius-lg); padding: 20px; overflow: hidden; transition: transform var(--duration-base) var(--ease-liquid), box-shadow var(--duration-base); }
+  .cell:hover { box-shadow: var(--shadow-frost-glow), var(--shadow-glass); }
+  .cell::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--duration-fast); background: radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.12), transparent 50%); }
+  .cell:hover::after { opacity: 1; }
+  .k { font: 500 11px var(--font-mono); letter-spacing: .08em; color: var(--ink-faint); text-transform: uppercase; }
+  .photo { grid-row: span 2; padding: 0; }
+  .photo > img { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: grayscale(.3); transition: filter var(--duration-base), transform 1.2s var(--ease-liquid); }
+  .photo:hover > img { filter: grayscale(0); transform: scale(1.04); }
+  .photo .tag { background: rgba(0,0,0,.78); position: absolute; left: 14px; bottom: 14px; right: 14px; display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 14px; }
+  .bio { grid-column: span 3; display: flex; flex-direction: column; justify-content: center; }
+  .bio p { margin: 8px 0 0; font-size: 17px; line-height: 1.6; color: var(--ink-muted); }
+  .bio strong { color: var(--ink); font-weight: 600; }
+  .big { font: 700 54px/1 var(--font-display); letter-spacing: -.04em; margin-top: 12px; }
+  .live { display: flex; align-items: center; gap: 8px; margin-top: 14px; font: 600 16px var(--font-display); }
+  .live i { width: 10px; height: 10px; border-radius: 50%; background: var(--signal-live); box-shadow: 0 0 0 0 rgba(74,222,128,.6); animation: pulse 2s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(74,222,128,0); } 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); } }
+  .clock { font: 600 34px/1 var(--font-mono); margin-top: 14px; letter-spacing: -.02em; }
+  .stack { grid-column: span 2; }
+  .icons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .icons span { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; transition: transform var(--duration-base) var(--ease-spring); }
+  .icons span:hover { transform: translateY(-4px) rotate(-6deg); }
+  .icons img { width: 58%; height: 58%; }
+  .cycle { grid-column: span 2; }
+  .steps { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+  .step { flex: 1; text-align: center; padding: 14px 6px; border-radius: 14px; font: 600 14px var(--font-display); background: var(--glass); border: 1px solid var(--glass-edge); transition: background var(--duration-base), color var(--duration-base); }
+  .step.on { background: var(--frost-100); color: var(--on-frost); box-shadow: 0 0 24px rgba(223,225,236,.3); }
+  .arrow { color: var(--ink-faint); }
+  @media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+</style></head>
+<body>
+<div id="root" class="r4-stage bb-wrap">
+  <div class="r4-eyebrow">Sobre mí</div>
+  <h2 class="r4-title" style="font-size:38px;margin-top:8px">Nico, en piezas.</h2>
+  <div class="grid" id="grid">
+    <div class="cell r4-glass photo"><img src="../../assets/nico-700.webp" alt="Foto de Nico">
+      <div class="tag r4-glass"><span style="font:700 18px var(--font-display)">Nico</span><img src="../../assets/logo-404-cuadrado.png" alt="404" style="height:22px;mix-blend-mode:screen"></div></div>
+    <div class="cell r4-glass bio"><div class="k">bio</div>
+      <p>Soy <strong>developer</strong> con foco en calidad. Trabajo el ciclo completo: escribo código, hago <strong>QA</strong> y aseguro que lo que se lanza funciona de verdad. Diseño y automatizo <strong>workflows</strong> y aprovecho la <strong>IA</strong> para acelerar cada etapa sin perder control ni criterio.</p></div>
+    <div class="cell r4-glass"><div class="k">estado</div><div class="live"><i></i>Disponible</div><div style="font-size:13px;color:var(--ink-muted);margin-top:8px">para proyectos nuevos</div></div>
+    <div class="cell r4-glass"><div class="k">A Coruña · ES</div><div class="clock" id="clock">--:--</div><div style="font-size:13px;color:var(--ink-muted);margin-top:8px" id="zone">hora local</div></div>
+    <div class="cell r4-glass"><div class="k">proyectos</div><div class="big r4-frost-text" data-count="5">0</div></div>
+    <div class="cell r4-glass stack"><div class="k">stack diario</div><div class="icons" id="icons"></div></div>
+    <div class="cell r4-glass cycle"><div class="k">cómo trabajo</div>
+      <div class="steps" id="steps"><div class="step">Código</div><span class="arrow">→</span><div class="step">QA</div><span class="arrow">→</span><div class="step">Workflow IA</div><span class="arrow">→</span><div class="step">Lanzar</div></div></div>
+  </div>
+</div>
+<script>
+(function () {
+  var R = window.R4;
+  // stack: primeras 10 tecnologías
+  var ic = document.getElementById('icons');
+  R.TECH.slice(0, 10).forEach(function (t) { var s = R.el('span', 'r4-frost-chip', '<img alt="" src="' + t.src + '">'); s.title = t.name; ic.appendChild(s); });
+  // brillo que sigue al ratón
+  document.querySelectorAll('.cell').forEach(function (c) { c.addEventListener('pointermove', function (e) { var r = c.getBoundingClientRect(); c.style.setProperty('--gx', e.clientX - r.left + 'px'); c.style.setProperty('--gy', e.clientY - r.top + 'px'); }); });
+  // reloj en Europe/Madrid
+  var fmt = new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  function clock() { document.getElementById('clock').textContent = fmt.format(new Date()); } clock(); setInterval(clock, 1000);
+  // contadores al entrar en pantalla
+  var done = false;
+  function count() { if (done) return; done = true; document.querySelectorAll('[data-count]').forEach(function (n) { var to = +n.dataset.count, t0 = performance.now();
+    (function s(now) { var k = Math.min(1, (now - t0) / 900); n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(s); })(t0); }); }
+  new IntersectionObserver(function (es) { if (es[0].isIntersecting) count(); }).observe(document.getElementById('grid')); setTimeout(count, 400);
+  // ciclo de trabajo que se ilumina en bucle
+  var steps = document.querySelectorAll('.step'), i = 0;
+  setInterval(function () { steps.forEach(function (s, k) { s.classList.toggle('on', k === i); }); i = (i + 1) % steps.length; }, R.reduced ? 99999 : 1200);
+  steps[0].classList.add('on');
+})();
+</script>
+</body>
+</html>

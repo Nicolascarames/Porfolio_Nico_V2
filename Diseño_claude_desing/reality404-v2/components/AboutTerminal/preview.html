@@ -1,0 +1,74 @@
+<!-- @dsCard group="Sobre mí" height=560 subtitle="Terminal reality404: escribe la bio sola y luego acepta comandos" -->
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../../shared/bundle.css"><script src="../../shared/bundle.js"></script><meta charset="utf-8"><title>AboutTerminal — preview</title>
+<style>
+  .at-wrap { padding: 32px; min-height: 560px; display: grid; place-items: center; }
+  .term { width: min(760px, 100%); border-radius: var(--radius-xl); overflow: hidden; }
+  .bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--glass-edge); background: rgba(255,255,255,.03); }
+  .bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--frost-400); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+  .bar i:first-child { background: var(--frost-200); }
+  .bar span { margin-left: 10px; font: 500 12px var(--font-mono); color: var(--ink-faint); }
+  .bar img { margin-left: auto; height: 18px; mix-blend-mode: screen; }
+  .out { height: 380px; overflow-y: auto; padding: 18px 20px; font: 400 14px/1.7 var(--font-mono); color: var(--ink-muted); cursor: text; }
+  .out .cmd { color: var(--ink); }
+  .out .ps { color: var(--frost-200); }
+  .out .hi { color: var(--ink); font-weight: 500; }
+  .out .ok { color: var(--signal-live); }
+  .out .art { color: var(--frost-100); text-shadow: 0 0 12px rgba(223,225,236,.45); line-height: 1.1; white-space: pre; font-size: 12px; }
+  .line { display: flex; gap: 8px; }
+  .line input { flex: 1; background: transparent; border: 0; outline: none; color: var(--ink); font: inherit; caret-color: var(--frost-100); }
+  .caret { display: inline-block; width: 8px; height: 16px; background: var(--frost-100); vertical-align: -3px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 20px 16px; }
+  .chips button { font: 500 12px var(--font-mono); padding: 6px 10px; border-radius: var(--radius-pill); cursor: pointer; background: var(--glass); color: var(--ink-muted); border: 1px solid var(--glass-edge); }
+  .chips button:hover { color: var(--ink); box-shadow: var(--shadow-frost-glow); }
+</style></head>
+<body>
+<div id="root" class="r4-stage at-wrap">
+  <div class="term r4-glass" style="background:rgba(10,10,12,.6)">
+    <div class="bar"><i></i><i></i><i></i><span>nico@reality404: ~/sobre-mi</span><img src="../../assets/logo-404-cuadrado.png" alt=""></div>
+    <div class="out" id="out" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var R = window.R4, out = document.getElementById('out'), chips = document.getElementById('chips'), PS = '<span class="ps">reality404 ~ $</span> ';
+  var ART = ' _  _    ___   _  _\n| || |  / _ \\ | || |\n| || |_| | | || || |_\n|__   _| |_| ||__   _|\n   |_|  \\___/    |_|';
+  var CMDS = {
+    whoami: ['<span class="hi">Nico</span> — developer, design and workflows with AI'],
+    'cat sobre-mi.txt': ['Soy <span class="hi">developer</span> con foco en calidad. Trabajo el ciclo completo:', 'escribo código, hago <span class="hi">QA</span> y aseguro que lo que se lanza funciona de verdad.', 'Diseño y automatizo <span class="hi">workflows</span> y aprovecho la <span class="hi">IA</span> para acelerar', 'cada etapa del desarrollo sin perder control ni criterio.'],
+    'ls stack/': [R.TECH.map(function (t) { return t.name; }).join('  ')],
+    'ls proyectos/': [R.PROJECTS.map(function (p) { return '<span class="hi">' + p.title + '/</span>'; }).join('  ')],
+    status: ['<span class="ok">●</span> Disponible para proyectos · A Coruña, ES'],
+    help: ['comandos: whoami · cat sobre-mi.txt · ls stack/ · ls proyectos/ · status · contacto · clear'],
+    contacto: ['→ baja a <span class="hi">#contacto</span> o escribe <span class="hi">hola</span> en el formulario 404']
+  };
+  function print(html, cls) { var d = R.el('div', cls || '', html); out.insertBefore(d, prompt); out.scrollTop = out.scrollHeight; return d; }
+  var prompt = R.el('div', 'line', PS.trim() + '<input aria-label="Escribe un comando" autocomplete="off" spellcheck="false">'); out.appendChild(prompt);
+  var input = prompt.querySelector('input');
+  out.addEventListener('click', function () { input.focus(); });
+  function run(cmd, typed) {
+    cmd = cmd.trim(); if (!cmd) return;
+    if (!typed) print(PS + '<span class="cmd">' + cmd + '</span>');
+    if (cmd === 'clear') { [].slice.call(out.children).forEach(function (c) { if (c !== prompt) c.remove(); }); return; }
+    (CMDS[cmd] || ['comando no encontrado: <span class="hi">' + cmd + '</span> — error 404, prueba <span class="hi">help</span>']).forEach(function (l) { print(l); });
+  }
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var v = input.value; input.value = ''; print(PS + '<span class="cmd">' + v.replace(/</g, '&lt;') + '</span>'); run(v, true); } });
+  ['whoami', 'cat sobre-mi.txt', 'ls stack/', 'ls proyectos/', 'status', 'help', 'clear'].forEach(function (c) { var b = R.el('button', '', c); b.onclick = function () { run(c); input.focus({ preventScroll: true }); }; chips.appendChild(b); });
+
+  /* Intro: el arte 404 y una sesión escrita sola */
+  print(ART, 'art'); print('&nbsp;');
+  var script = ['whoami', 'cat sobre-mi.txt', 'status'], si = 0;
+  function typeNext() {
+    if (si >= script.length) { print('&nbsp;'); print('escribe <span class="hi">help</span> o pulsa un comando ↓'); return; }
+    var cmd = script[si++], line = print(PS + '<span class="cmd"></span><span class="caret"></span>'), c = line.querySelector('.cmd'), k = 0;
+    (function t() { if (k <= cmd.length) { c.textContent = cmd.slice(0, k++); setTimeout(t, R.reduced ? 0 : 55 + Math.random() * 40); }
+      else { line.querySelector('.caret').remove(); run(cmd, true); setTimeout(typeNext, R.reduced ? 0 : 500); } })();
+  }
+  new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { o.disconnect(); setTimeout(typeNext, 400); } }).observe(out);
+})();
+</script>
+</body>
+</html>
