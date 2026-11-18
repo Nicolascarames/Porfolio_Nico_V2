@@ -15,6 +15,11 @@ export function HomePage() {
   const deviceRef = useRef<DeviceShowcaseHandle>(null);
 
   function handleSelectProject(project: Project, el: HTMLElement) {
+    // Proyectos externos: pestaña nueva, sin animación (ver memory.md, Carrusel).
+    if (project.externalUrl) {
+      window.open(project.externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
     // Coreografía elegida 2026-11-18: sin clon, el dispositivo ampliado sale
     // de la caja de la tarjeta (escala uniforme) mientras la tarjeta se funde.
     const cardBox = el.getBoundingClientRect();
