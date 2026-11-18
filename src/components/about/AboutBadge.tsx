@@ -37,7 +37,9 @@ export function AboutBadge() {
   const phys = useRef({
     p: { x: AX + 60, y: AY + 150 - 40 },
     v: { x: 0, y: 0 },
-    off: { x: 0, y: 0 },
+    off: { x: 0, y: 0 }, // punto agarrado, en coordenadas de la credencial sin girar (origen: pinza)
+    ptr: { x: 0, y: 0 }, // último puntero, en coordenadas del rig
+    grabBase: 0, // desfase de ángulo al agarrar: evita un salto al empezar
     dragging: false,
     moved: 0,
     ang: 0,
@@ -60,7 +62,24 @@ export function AboutBadge() {
       const restX = AX;
       const restY = AY + LEN;
       const { p, v } = st;
-      if (!st.dragging) {
+      if (st.dragging) {
+        // La credencial gira sobre la pinza: se coloca la pinza de forma que el
+        // punto agarrado (girado con el ángulo actual) quede bajo el puntero.
+        // Sin esto el giro sumaba su propio desplazamiento y el movimiento se
+        // multiplicaba (×2,6 al cogerla por abajo). El ángulo sale de la recta
+        // ancla→puntero (no de la pinza): si dependiera de la pinza, que a su
+        // vez depende del ángulo, el bucle se dispara al cogerla por abajo.
+        const aim = Math.atan2(-(st.ptr.x - AX), st.ptr.y - AY) * 0.9 + st.grabBase;
+        st.ang += (aim - st.ang) * 0.25;
+        const c = Math.cos(st.ang);
+        const sn = Math.sin(st.ang);
+        const nx = st.ptr.x - (st.off.x * c - st.off.y * sn);
+        const ny = st.ptr.y - (st.off.x * sn + st.off.y * c);
+        v.x = nx - p.x;
+        v.y = ny - p.y;
+        p.x = nx;
+        p.y = ny;
+      } else {
         // muelle suave hacia el reposo + gravedad (G/K ≈ 11 px de caída en reposo);
         // la cuerda no se estira más de LEN*1.9 y la velocidad tiene tope
         const K = 0.016;
@@ -90,8 +109,10 @@ export function AboutBadge() {
         p.x = AX + (dx / d) * max;
         p.y = AY + (dy / d) * max;
       }
-      const target = Math.atan2(-(p.x - AX), p.y - AY) * 0.9 + v.x * -0.02;
-      st.ang += (target - st.ang) * 0.25;
+      if (!st.dragging) {
+        const target = Math.atan2(-(p.x - AX), p.y - AY) * 0.9 + v.x * -0.02;
+        st.ang += (target - st.ang) * 0.25;
+      }
       const deg = (reduced ? 0 : (st.ang * 180) / Math.PI);
       badge.style.transform = `translate(${p.x - BW / 2}px,${p.y}px) rotate(${deg}deg)`;
       badge.style.transformOrigin = '50% 0';
@@ -118,7 +139,14 @@ export function AboutBadge() {
     const q = rel(e);
     st.dragging = true;
     st.moved = 0;
-    st.off = { x: q.x - st.p.x, y: q.y - st.p.y };
+    st.ptr = q;
+    // punto agarrado relativo a la pinza, deshaciendo el giro actual
+    const dx = q.x - st.p.x;
+    const dy = q.y - st.p.y;
+    const c = Math.cos(st.ang);
+    const sn = Math.sin(st.ang);
+    st.off = { x: dx * c + dy * sn, y: -dx * sn + dy * c };
+    st.grabBase = st.ang - Math.atan2(-(q.x - AX), q.y - AY) * 0.9;
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
@@ -130,13 +158,8 @@ export function AboutBadge() {
     const st = phys.current;
     if (!st.dragging) return;
     const q = rel(e);
-    const nx = q.x - st.off.x;
-    const ny = q.y - st.off.y;
-    st.moved += Math.abs(nx - st.p.x) + Math.abs(ny - st.p.y);
-    st.v.x = nx - st.p.x;
-    st.v.y = ny - st.p.y;
-    st.p.x = nx;
-    st.p.y = ny;
+    st.moved += Math.abs(q.x - st.ptr.x) + Math.abs(q.y - st.ptr.y);
+    st.ptr = q; // el tick coloca la credencial
   };
 
   const onPointerUp = () => {
