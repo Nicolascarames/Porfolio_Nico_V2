@@ -3,3 +3,6 @@ dist
 .env
 .env.local
 supabase/.temp
+
+# Capturas y logs de Playwright MCP
+.playwright-mcp

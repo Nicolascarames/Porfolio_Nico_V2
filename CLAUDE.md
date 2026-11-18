@@ -1,6 +1,6 @@
 # CLAUDE.md — Portfolio_Nico_V2
 
-Portfolio personal de Nico (marca personal, no solo caza de empleo). Estado: prototipo — de momento solo existen mockups de diseño exportados; el código real de la app (Vite + React) todavía no está scaffoldeado.
+Portfolio personal de Nico (marca personal, no solo caza de empleo). Estado: app real en `src/` (Vite + React + TS + Tailwind v4), desplegada en Vercel. En curso: rediseño reality404 v2 (ver `memory.md`).
 
 ## Idioma y trato
 
@@ -18,7 +18,7 @@ El objetivo de cada sesión es sacar trabajo productivo y terminado, no volumen 
 ## Inicio de cada sesión
 
 1. Lee `memory.md` entero antes de la primera tarea. Es la memoria del proyecto y del usuario; ignorarla repite errores ya corregidos.
-2. Pregunta al usuario: «¿Activo claude-brain para esta sesión?». Si dice que sí, invoca la skill `claude-brain` y sigue su protocolo de planificación y enrutado de modelos durante toda la sesión.
+2. No uses skills ni plugins en este repo (desactivados en `.claude/settings.json`): decide tú cómo actuar en cada caso.
 
 ## Memoria (`memory.md`)
 
@@ -28,21 +28,24 @@ El objetivo de cada sesión es sacar trabajo productivo y terminado, no volumen 
 
 ## Exploración del código y economía de tokens
 
-- Para localizar código usa PRIMERO el grafo de codebase-memory (`search_graph`, `trace_path`, `get_code_snippet`, `get_architecture`); Grep/Read solo para texto plano, configs o cuando el grafo no cubra. El repo aún no está indexado (solo hay mockups, sin código real) — indexar con `index_repository` en cuanto exista el scaffold de Vite+React.
+- Para localizar código usa Grep/Glob y lee rangos concretos.
 - Lee estrecho: secciones concretas, no ficheros enteros; nunca releas lo que ya está en contexto.
 - Piensa caro, ejecuta barato: la planificación y el diagnóstico difícil van al modelo potente (opusplan); la ejecución mecánica y las búsquedas, al barato. No uses el modelo caro para trabajo de peón.
 
 ## Seguridad y producción
 
-Antes de cualquier despliegue a producción (Vercel) — y tras tocar autenticación, claves, formularios o subida de ficheros — pasa la skill `seguridad-seo` y resuelve sus hallazgos. Sin auditoría no hay deploy.
+Antes de cualquier despliegue a producción (Vercel) — y tras tocar autenticación, claves, formularios o subida de ficheros — haz una revisión de seguridad propia (secretos, validación de entrada en `api/`, cabeceras) y resuelve lo que encuentres.
 
 ## Mapa del proyecto
 
 - Mockups de diseño (referencia visual, exportados de la herramienta de diseño de Claude — formato `dc-runtime`): `Diseño_claude_desing/Portfolio.dc.html`, `Diseño_claude_desing/Login.dc.html`.
 - `Diseño_claude_desing/support.js`: runtime generado ("do not edit"), no forma parte del stack final — no reutilizar en la app real.
 - Capturas y assets de referencia: `Diseño_claude_desing/screenshots/`, `Diseño_claude_desing/uploads/`.
-- Código real de la app (Vite + React): aún no existe — pendiente de scaffold.
+- Código de la app: `src/` (componentes en `src/components/`, datos en `src/data/`, auth en `src/auth-kit/`), función serverless `api/contact.ts`.
+- Rediseño v2: `Diseño_claude_desing/reality404-v2/` (brief `BRIEF_CLAUDE_CODE.md`, demos `components/*/preview.html`).
 
 ## Comandos
 
-Aún no hay proyecto Vite scaffoldeado. En cuanto se cree, documentar aquí `dev` / `build` / `lint` reales — no inventar comandos genéricos mientras tanto.
+- `npm run dev` — servidor Vite
+- `npm run build` — build de producción
+- `npm test` — Vitest (solo `api/contact.ts`)
