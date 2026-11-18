@@ -1,7 +1,8 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { DeviceFrame } from 'device-frame/react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
-import { useDeviceFullscreen } from '../hooks/useDeviceFullscreen';
+import { fitViewport, useDeviceFullscreen } from '../hooks/useDeviceFullscreen';
+import type { FlyBox } from '../lib/flyTo';
 import { HelpModal } from './HelpModal';
 
 // /portfolio (no la raíz) es el punto de entrada público de Desktop_Nav: activa
@@ -22,6 +23,8 @@ interface DeviceShowcaseProps {
 export interface DeviceShowcaseHandle {
   expand: () => void;
   collapse: () => void;
+  /** Caja de viewport que ocupará el dispositivo ampliado (destino del vuelo). */
+  fullscreenBox: () => FlyBox;
 }
 
 export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcaseProps>(function DeviceShowcase(
@@ -34,12 +37,13 @@ export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcasePro
 
   const slotRef = useRef<HTMLDivElement>(null);
   const deviceRef = useRef<HTMLDivElement>(null);
-  const { isFull, expand, collapse, exitRef } = useDeviceFullscreen(
-    deviceRef,
-    slotRef,
-    isMobile ? PHONE_ASPECT : TABLET_ASPECT,
-  );
-  useImperativeHandle(ref, () => ({ expand, collapse }), [expand, collapse]);
+  const aspect = isMobile ? PHONE_ASPECT : TABLET_ASPECT;
+  const { isFull, expand, collapse, exitRef } = useDeviceFullscreen(deviceRef, slotRef, aspect);
+  useImperativeHandle(ref, () => ({ expand, collapse, fullscreenBox: () => fitViewport(aspect) }), [
+    expand,
+    collapse,
+    aspect,
+  ]);
 
   // Ancho tope en vh para que la altura (que device-frame deriva del ancho vía
   // aspect-ratio en modo inline, ver Iphone_Clone/src/device-frame.ts) nunca

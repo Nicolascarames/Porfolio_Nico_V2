@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase, type DeviceShowcaseHandle } from '../components/DeviceShowcase';
-import { ProjectsCarousel } from '../components/ProjectsCarousel';
+import { ProjectsSection } from '../components/projects/ProjectsSection';
+import { flyTo } from '../lib/flyTo';
 import { TechMarquee } from '../components/TechMarquee';
 import { About } from '../components/About';
 import { ContactForm } from '../components/ContactForm';
@@ -14,7 +15,20 @@ export function HomePage() {
   const [openTitle, setOpenTitle] = useState('reality404');
   const deviceRef = useRef<DeviceShowcaseHandle>(null);
 
-  function handleSelectProject(project: Project) {
+  const flying = useRef(false);
+
+  async function handleSelectProject(project: Project, el: HTMLElement) {
+    if (flying.current) return;
+    // La tarjeta vuela al centro de la pantalla, a la caja que ocupará la
+    // tablet ampliada: así el vuelo siempre se ve aunque la tablet esté fuera
+    // de pantalla, y empalma con la ampliación (decisión 2026-11-18).
+    // Instantáneo con reduced motion.
+    const target = deviceRef.current?.fullscreenBox() ?? document.getElementById('tablet-frame');
+    if (target) {
+      flying.current = true;
+      await flyTo(el, target);
+      flying.current = false;
+    }
     setOpenProjectId(project.desktopNavId ?? null);
     setOpenTitle(project.title);
     // Alinea el borde inferior de la Tablet (no del bloque de botones) con
@@ -32,7 +46,7 @@ export function HomePage() {
       <div className="relative">
         <Hero />
         <DeviceShowcase ref={deviceRef} openProjectId={openProjectId} title={openTitle} />
-        <ProjectsCarousel onSelectProject={handleSelectProject} />
+        <ProjectsSection onSelectProject={handleSelectProject} />
         <TechMarquee />
         <About />
         <ContactForm />

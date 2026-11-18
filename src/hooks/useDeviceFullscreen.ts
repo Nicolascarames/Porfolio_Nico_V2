@@ -29,7 +29,8 @@ function measure(el: Element): Box {
   return { left: r.left, top: r.top, width: r.width, height: r.height };
 }
 
-function fitViewport(aspect: number): Box {
+/** Caja (viewport) que ocupa el dispositivo ampliado con esa proporción. */
+export function fitViewport(aspect: number): Box {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const width = Math.min(vw, vh * aspect);

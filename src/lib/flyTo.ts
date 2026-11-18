@@ -3,13 +3,22 @@ import { prefersReducedMotion } from '../hooks/useReducedMotion';
 /**
  * La tarjeta "vuela" hasta la pantalla de la tablet: FLIP con un clon fijo
  * (port de R4.flyTo, Diseño_claude_desing/reality404-v2/shared/bundle.js).
- * Resuelve al terminar; con reduced motion resuelve al instante.
+ * El destino es un elemento o una caja en coordenadas de viewport (p. ej. la
+ * que ocupará la tablet ampliada). Resuelve al terminar; con reduced motion
+ * resuelve al instante.
  */
-export function flyTo(fromEl: HTMLElement, toEl: HTMLElement): Promise<void> {
+export interface FlyBox {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+export function flyTo(fromEl: HTMLElement, to: HTMLElement | FlyBox): Promise<void> {
   if (prefersReducedMotion() || !fromEl.animate) return Promise.resolve();
 
   const a = fromEl.getBoundingClientRect();
-  const b = toEl.getBoundingClientRect();
+  const b = to instanceof HTMLElement ? to.getBoundingClientRect() : to;
   const ghost = fromEl.cloneNode(true) as HTMLElement;
   ghost.removeAttribute('id');
   ghost.setAttribute('aria-hidden', 'true');
