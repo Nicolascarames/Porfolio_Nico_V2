@@ -26,9 +26,18 @@
  *   'bento'     Rejilla con todos los proyectos a la vez; se inclinan con el
  *               ratón. El primer proyecto ocupa la tarjeta grande.
  *
- * (Las secciones de tecnologías, sobre mí y contacto se añadirán aquí en
- * sus fases, con el mismo formato.)
+ * tech (sección "Stack / Tecnologías"):
+ *   'physics'   Caja con física real: las fichas caen, se apilan, se cogen
+ *               y se lanzan. Botones "Agitar caja" e "Invertir gravedad".
+ *   'tower'     Pirámide de 16 fichas que se derriba (bola, empujones) y se
+ *               reconstruye sola. La más "juego". Necesita ≥ 340 px de ancho.
+ *   'magnet'    Nube de iconos flotando con hilos de luz; el cursor los
+ *               repele o atrae. Sin motor de física (la más ligera).
+ *
+ * (Las secciones de sobre mí y contacto se añadirán aquí en sus fases, con
+ * el mismo formato.)
  */
 export const sections = {
   projects: 'bento' as 'deck' | 'coverflow' | 'bento',
+  tech: 'physics' as 'physics' | 'tower' | 'magnet',
 };

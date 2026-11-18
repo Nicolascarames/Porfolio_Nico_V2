@@ -3,7 +3,7 @@ import { Hero } from '../components/Hero';
 import { DeviceShowcase, type DeviceShowcaseHandle } from '../components/DeviceShowcase';
 import { ProjectsSection } from '../components/projects/ProjectsSection';
 import { flyTo } from '../lib/flyTo';
-import { TechMarquee } from '../components/TechMarquee';
+import { TechSection } from '../components/tech/TechSection';
 import { About } from '../components/About';
 import { ContactForm } from '../components/ContactForm';
 import { Footer } from '../components/Footer';
@@ -47,7 +47,7 @@ export function HomePage() {
         <Hero />
         <DeviceShowcase ref={deviceRef} openProjectId={openProjectId} title={openTitle} />
         <ProjectsSection onSelectProject={handleSelectProject} />
-        <TechMarquee />
+        <TechSection />
         <About />
         <ContactForm />
         <Footer />

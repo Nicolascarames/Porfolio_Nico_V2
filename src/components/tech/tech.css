@@ -1,0 +1,38 @@
+/* Variantes de tecnologías (port de Diseño_claude_desing/reality404-v2/components/
+   TechPhysicsBox, TechStackTower y TechMagnetCloud: mismos nombres de clase). */
+
+/* TechPhysicsBox */
+.tp-box { position: relative; height: 380px; border-radius: var(--radius-r4-xl); overflow: hidden; cursor: grab; touch-action: none; }
+.tp-box:active { cursor: grabbing; }
+.tp-box::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.07), transparent 30%); }
+.tp-chip { position: absolute; left: 0; top: 0; width: 64px; height: 64px; border-radius: var(--radius-r4-md); display: grid; place-items: center; pointer-events: none; will-change: transform; }
+.tp-chip img { width: 58%; height: 58%; object-fit: contain; pointer-events: none; }
+.tp-chip span { position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 11px var(--font-display); color: var(--color-ink); opacity: 0; transition: opacity var(--duration-fast); }
+.tp-chip.hot { box-shadow: inset 0 1px 0 #fff, 0 0 0 2px var(--color-frost-100), 0 0 30px rgba(223,225,236,.45); }
+.tp-chip.hot span { opacity: 1; }
+
+/* TechStackTower */
+.tw-stage { position: relative; height: 400px; border-radius: var(--radius-r4-xl); overflow: hidden; cursor: grab; touch-action: none; }
+.tw-stage:active { cursor: grabbing; }
+.tw-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); border-top: 1px solid var(--color-glass-edge); }
+.tw-chip { position: absolute; left: 0; top: 0; width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; pointer-events: none; will-change: transform; }
+.tw-chip img { width: 56%; height: 56%; object-fit: contain; }
+.tw-ball { position: absolute; left: 0; top: 0; width: 46px; height: 46px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 32% 28%, #fff 0 8%, #c9ccd8 22%, #4a4c55 60%, #0d0d10 100%); box-shadow: 0 0 24px rgba(223,225,236,.35); }
+.tw-status { position: absolute; top: 16px; left: 18px; font: 500 12px var(--font-mono); color: var(--color-ink-muted); }
+
+/* TechMagnetCloud */
+.mc-seg { display: inline-flex; padding: 4px; border-radius: var(--radius-pill); gap: 4px; }
+.mc-seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: var(--radius-pill); font: 600 13px var(--font-display); color: var(--color-ink-muted); cursor: pointer; }
+.mc-seg button[aria-pressed="true"] { background: var(--color-frost-100); color: var(--color-on-frost); }
+.mc-cloud { position: relative; height: 360px; border-radius: var(--radius-r4-xl); overflow: hidden; touch-action: none; }
+.mc-cloud canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mc-chip { position: absolute; left: 0; top: 0; width: 58px; height: 58px; border-radius: var(--radius-r4-md); display: grid; place-items: center; cursor: grab; will-change: transform; border: 0; padding: 0; }
+.mc-chip img { width: 58%; height: 58%; object-fit: contain; pointer-events: none; }
+.mc-chip.drag { cursor: grabbing; box-shadow: inset 0 1px 0 #fff, 0 0 0 2px var(--color-frost-100), 0 0 30px rgba(223,225,236,.5); z-index: 5; }
+.mc-tip { position: absolute; left: 0; top: 0; pointer-events: none; padding: 6px 10px; border-radius: var(--radius-pill); font: 600 12px var(--font-display); background: var(--color-surface-raised); border: 1px solid var(--color-glass-edge); opacity: 0; transition: opacity var(--duration-fast); white-space: nowrap; z-index: 6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-chip span, .mc-tip { transition: none; }
+}

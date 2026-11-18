@@ -101,11 +101,3 @@ a.nav-cta, a.nav-cta:hover, button.nav-cta {
   color: var(--color-bg);
 }
 input::placeholder, textarea::placeholder { color: #6b6b66; }
-
-@keyframes marqR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-
-.marquee-track:hover { animation-play-state: paused; }
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
-}
