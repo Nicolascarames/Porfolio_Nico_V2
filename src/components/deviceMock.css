@@ -1,0 +1,44 @@
+/* Marco 'mock' (config/sections.ts → device): marco CSS del mock de Claude Design,
+   reality404-v2/components/DeviceFullscreen/preview.html. El hook anima
+   left/top/width/height; el bisel y las esquinas van a 0 por transición. */
+.df-mock {
+  position: relative;
+  border-radius: 34px;
+  padding: 14px;
+  background: linear-gradient(160deg, #2b2c33, #0b0b0e 60%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.6),
+    0 40px 80px -30px #000;
+  transition:
+    padding 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.df-mock.tablet { aspect-ratio: 4 / 3; }
+.df-mock.phone { aspect-ratio: 1 / 2; border-radius: 40px; padding: 10px; }
+.df-mock.is-full { padding: 0; border-radius: 0; }
+.df-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #0b0b0e;
+  transition: border-radius 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.df-mock.phone .df-screen { border-radius: 31px; }
+.df-mock.is-full .df-screen { border-radius: 0; }
+.df-screen iframe { display: block; width: 100%; height: 100%; border: 0; }
+.df-cam {
+  position: absolute; top: 5px; left: 50%; width: 6px; height: 6px; margin-left: -3px;
+  border-radius: 50%; background: #1d1e24; box-shadow: inset 0 0 2px #000;
+  transition: opacity 200ms;
+}
+.df-mock.phone .df-cam {
+  top: 16px; width: 60px; height: 18px; margin-left: -30px; border-radius: 99px; background: #000; z-index: 2;
+}
+.df-mock.is-full .df-cam { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .df-mock, .df-screen { transition: none; }
+}

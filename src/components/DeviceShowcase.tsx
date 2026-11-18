@@ -1,9 +1,10 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { DeviceFrame } from 'device-frame/react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
-import { fitViewport, useDeviceFullscreen } from '../hooks/useDeviceFullscreen';
-import type { FlyBox } from '../lib/flyTo';
+import { useDeviceFullscreen, type FullscreenEntry } from '../hooks/useDeviceFullscreen';
 import { HelpModal } from './HelpModal';
+import { sections } from '../config/sections';
+import './deviceMock.css';
 
 // /portfolio (no la raíz) es el punto de entrada público de Desktop_Nav: activa
 // guestMode y no exige login. También lee ?open=<id> para abrir ese proyecto
@@ -14,6 +15,14 @@ const BASE_URL = 'https://desktop-nav.vercel.app/portfolio';
 const TABLET_ASPECT = 1195 / 960;
 const PHONE_ASPECT = 2500 / 4722;
 
+// Marco del dispositivo (config/sections.ts → device). 'mock': marco CSS del
+// mock de Claude Design (reality404-v2/components/DeviceFullscreen/preview.html),
+// tablet 4:3 y móvil 1:2, que al ampliar ocupa todo el viewport (bisel → 0).
+// 'real': device-frame de Iphone_Clone, se conserva por si se vuelve a él.
+const MOCK = sections.device === 'mock';
+const MOCK_TABLET_ASPECT = 4 / 3;
+const MOCK_PHONE_ASPECT = 1 / 2;
+
 interface DeviceShowcaseProps {
   openProjectId?: string | null;
   /** Título que muestra la barra de pantalla completa. */
@@ -21,10 +30,8 @@ interface DeviceShowcaseProps {
 }
 
 export interface DeviceShowcaseHandle {
-  expand: () => void;
+  expand: (entry?: FullscreenEntry) => void;
   collapse: () => void;
-  /** Caja de viewport que ocupará el dispositivo ampliado (destino del vuelo). */
-  fullscreenBox: () => FlyBox;
 }
 
 export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcaseProps>(function DeviceShowcase(
@@ -37,20 +44,26 @@ export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcasePro
 
   const slotRef = useRef<HTMLDivElement>(null);
   const deviceRef = useRef<HTMLDivElement>(null);
-  const aspect = isMobile ? PHONE_ASPECT : TABLET_ASPECT;
-  const { isFull, expand, collapse, exitRef } = useDeviceFullscreen(deviceRef, slotRef, aspect);
-  useImperativeHandle(ref, () => ({ expand, collapse, fullscreenBox: () => fitViewport(aspect) }), [
-    expand,
-    collapse,
-    aspect,
-  ]);
+  const aspect = MOCK
+    ? isMobile
+      ? MOCK_PHONE_ASPECT
+      : MOCK_TABLET_ASPECT
+    : isMobile
+      ? PHONE_ASPECT
+      : TABLET_ASPECT;
+  const { isFull, expand, collapse, exitRef } = useDeviceFullscreen(deviceRef, slotRef, aspect, MOCK);
+  useImperativeHandle(ref, () => ({ expand, collapse }), [expand, collapse]);
 
   // Ancho tope en vh para que la altura (que device-frame deriva del ancho vía
   // aspect-ratio en modo inline, ver Iphone_Clone/src/device-frame.ts) nunca
   // supere 100vh. Ratios exactos de Iphone_Clone/src/geometry.ts.
-  const maxWidth = isMobile
-    ? 'min(95vw, calc(100vh * 2500 / 4722))'
-    : 'min(85vw, 1800px, calc(100vh * 1195 / 960))';
+  const maxWidth = MOCK
+    ? isMobile
+      ? 'min(95vw, calc(100vh * 1 / 2))'
+      : 'min(85vw, 1800px, calc(100vh * 4 / 3))'
+    : isMobile
+      ? 'min(95vw, calc(100vh * 2500 / 4722))'
+      : 'min(85vw, 1800px, calc(100vh * 1195 / 960))';
 
   return (
     <section className="flex flex-col items-center py-12 sm:py-20">
@@ -60,25 +73,35 @@ export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcasePro
           <div
             id="tablet-frame"
             ref={deviceRef}
+            className={MOCK ? `df-mock ${isMobile ? 'phone' : 'tablet'} ${isFull ? 'is-full' : ''}` : undefined}
             tabIndex={-1}
             aria-label={isFull ? `${title}, pantalla completa` : undefined}
             onDoubleClick={() => (isFull ? collapse() : expand())}
           >
-            <DeviceFrame
-              mode="inline"
-              device={isMobile ? 'phone' : 'tablet'}
-              size="l"
-              scale={2.5}
-              contentUrl={contentUrl}
-              background="transparent"
-              controls={false}
-              switcher={false}
-              open
-            />
+            {MOCK ? (
+              <>
+                <span className="df-cam" aria-hidden="true" />
+                <div className="df-screen">
+                  <iframe src={contentUrl} title={title} />
+                </div>
+              </>
+            ) : (
+              <DeviceFrame
+                mode="inline"
+                device={isMobile ? 'phone' : 'tablet'}
+                size="l"
+                scale={2.5}
+                contentUrl={contentUrl}
+                background="transparent"
+                controls={false}
+                switcher={false}
+                open
+              />
+            )}
           </div>
         </div>
         <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <button type="button" onClick={expand} className="r4-btn-ghost">
+          <button type="button" onClick={() => expand()} className="r4-btn-ghost">
             <span aria-hidden="true">⛶</span> Pantalla completa
           </button>
           <button

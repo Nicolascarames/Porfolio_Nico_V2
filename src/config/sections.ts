@@ -45,6 +45,12 @@
  *               nº de proyectos, stack diario y ciclo de trabajo.
  *   'terminal'  Terminal que escribe sola la bio y luego acepta comandos.
  *
+ * device (el dispositivo que muestra Desktop_Nav y se amplía al abrir un proyecto):
+ *   'mock'      Marco CSS del mock de Claude Design: tablet 4:3 / móvil 1:2.
+ *               Ampliado ocupa toda la pantalla, sin bisel. (Elegido 2026-11-18.)
+ *   'real'      Tablet/iPhone de Iphone_Clone (device-frame), con su puente de
+ *               rueda del ratón. Ampliado se centra conservando el marco.
+ *
  * contact (sección "Contacto"; las tres envían de verdad a /api/contact):
  *   'glass'     Formulario de vidrio clásico (nombre, email, mensaje).
  *   'chat'      Conversación: el formulario pregunta campo a campo.
@@ -55,4 +61,5 @@ export const sections = {
   tech: 'physics' as 'physics' | 'tower' | 'magnet',
   about: 'badge' as 'badge' | 'bento' | 'terminal',
   contact: 'terminal' as 'glass' | 'chat' | 'terminal',
+  device: 'mock' as 'mock' | 'real',
 };

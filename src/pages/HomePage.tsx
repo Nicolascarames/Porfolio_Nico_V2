@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { Hero } from '../components/Hero';
 import { DeviceShowcase, type DeviceShowcaseHandle } from '../components/DeviceShowcase';
 import { ProjectsSection } from '../components/projects/ProjectsSection';
-import { flyTo } from '../lib/flyTo';
 import { TechSection } from '../components/tech/TechSection';
 import { AboutSection } from '../components/about/AboutSection';
 import { ContactSection } from '../components/contact/ContactSection';
@@ -15,27 +14,17 @@ export function HomePage() {
   const [openTitle, setOpenTitle] = useState('reality404');
   const deviceRef = useRef<DeviceShowcaseHandle>(null);
 
-  const flying = useRef(false);
-
-  async function handleSelectProject(project: Project, el: HTMLElement) {
-    if (flying.current) return;
-    // La tarjeta vuela al centro de la pantalla, a la caja que ocupará la
-    // tablet ampliada: así el vuelo siempre se ve aunque la tablet esté fuera
-    // de pantalla, y empalma con la ampliación (decisión 2026-11-18).
-    // Instantáneo con reduced motion.
-    const target = deviceRef.current?.fullscreenBox() ?? document.getElementById('tablet-frame');
-    if (target) {
-      flying.current = true;
-      await flyTo(el, target);
-      flying.current = false;
-    }
+  function handleSelectProject(project: Project, el: HTMLElement) {
+    // Coreografía elegida 2026-11-18: sin clon, el dispositivo ampliado sale
+    // de la caja de la tarjeta (escala uniforme) mientras la tarjeta se funde.
+    const cardBox = el.getBoundingClientRect();
     setOpenProjectId(project.desktopNavId ?? null);
     setOpenTitle(project.title);
-    // Alinea el borde inferior de la Tablet (no del bloque de botones) con
-    // el borde inferior de la pantalla: puede ocupar hasta 100vh, así que
-    // alinear por arriba la dejaría recortada por abajo.
+    // Alinea el borde inferior del dispositivo con el de la pantalla para que,
+    // al salir de pantalla completa, vuelva a un hueco visible entero.
     scrollToId('tablet-frame', { align: 'bottom' });
-    deviceRef.current?.expand();
+    deviceRef.current?.expand({ kind: 'from', box: cardBox });
+    el.animate?.([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-out' });
   }
 
   return (

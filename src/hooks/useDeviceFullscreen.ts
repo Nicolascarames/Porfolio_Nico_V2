@@ -17,7 +17,7 @@ import { prefersReducedMotion } from './useReducedMotion';
 const DURATION = 640; // --duration-slow
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'; // --ease-liquid
 
-interface Box {
+export interface Box {
   left: number;
   top: number;
   width: number;
@@ -30,9 +30,11 @@ function measure(el: Element): Box {
 }
 
 /** Caja (viewport) que ocupa el dispositivo ampliado con esa proporción. */
-export function fitViewport(aspect: number): Box {
+export function fitViewport(aspect: number, fill = false): Box {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+  // fill: todo el viewport de borde a borde (marco 'mock', config/sections.ts).
+  if (fill) return { left: 0, top: 0, width: vw, height: vh };
   const width = Math.min(vw, vh * aspect);
   const height = width / aspect;
   return { left: (vw - width) / 2, top: (vh - height) / 2, width, height };
@@ -42,9 +44,17 @@ function toStyle(b: Box) {
   return { left: `${b.left}px`, top: `${b.top}px`, width: `${b.width}px`, height: `${b.height}px` };
 }
 
+/**
+ * Cómo entra el dispositivo al ampliarse:
+ * - sin entry: crece desde su hueco en la página (botón "Pantalla completa").
+ * - 'from': sale de la caja `box` (la tarjeta de proyecto pulsada) con escala
+ *   uniforme y fundido (elegido 2026-11-18).
+ */
+export type FullscreenEntry = { kind: 'from'; box: Box };
+
 export interface DeviceFullscreenApi {
   isFull: boolean;
-  expand: () => void;
+  expand: (entry?: FullscreenEntry) => void;
   collapse: () => void;
   /** Botón "Salir" de la HUD: recibe el foco al terminar de ampliar. */
   exitRef: RefObject<HTMLButtonElement>;
@@ -54,6 +64,7 @@ export function useDeviceFullscreen(
   deviceRef: RefObject<HTMLElement>,
   slotRef: RefObject<HTMLElement>,
   aspect: number,
+  fill = false,
 ): DeviceFullscreenApi {
   const [isFull, setIsFull] = useState(false);
   const full = useRef(false);
@@ -61,6 +72,8 @@ export function useDeviceFullscreen(
   const prevFocus = useRef<HTMLElement | null>(null);
   const aspectRef = useRef(aspect);
   aspectRef.current = aspect;
+  const fillRef = useRef(fill);
+  fillRef.current = fill;
   const exitRef = useRef<HTMLButtonElement>(null);
 
   const lockScroll = (on: boolean) => {
@@ -69,7 +82,7 @@ export function useDeviceFullscreen(
     html.scrollbarGutter = on ? 'stable' : '';
   };
 
-  const expand = useCallback(() => {
+  const expand = useCallback((entry?: FullscreenEntry) => {
     const dev = deviceRef.current;
     const slot = slotRef.current;
     if (!dev || !slot || full.current || busy.current) return;
@@ -83,7 +96,7 @@ export function useDeviceFullscreen(
     slot.style.width = `${from.width}px`;
     slot.style.height = `${from.height}px`;
     lockScroll(true);
-    const to = fitViewport(aspectRef.current);
+    const to = fitViewport(aspectRef.current, fillRef.current);
     Object.assign(dev.style, { position: 'fixed', zIndex: '1000', margin: '0' }, toStyle(to));
 
     const finish = () => {
@@ -91,7 +104,23 @@ export function useDeviceFullscreen(
       exitRef.current?.focus({ preventScroll: true });
     };
     if (prefersReducedMotion()) return finish();
-    dev.animate([toStyle(from), toStyle(to)], { duration: DURATION, easing: EASE }).onfinish = finish;
+    if (!entry) {
+      dev.animate([toStyle(from), toStyle(to)], { duration: DURATION, easing: EASE }).onfinish = finish;
+    } else {
+      // Escala uniforme (sin deformar) desde el centro de la tarjeta.
+      const b = entry.box;
+      const s = Math.min(b.width / to.width, b.height / to.height);
+      const dx = b.left + b.width / 2 - (to.left + to.width / 2);
+      const dy = b.top + b.height / 2 - (to.top + to.height / 2);
+      dev.animate(
+        [
+          { opacity: 0, transform: `translate(${dx}px, ${dy}px) scale(${s})` },
+          { opacity: 1, offset: 0.35 },
+          { opacity: 1, transform: 'none' },
+        ],
+        { duration: DURATION, easing: EASE },
+      ).onfinish = finish;
+    }
   }, [deviceRef, slotRef]);
 
   const collapse = useCallback(() => {
@@ -137,7 +166,7 @@ export function useDeviceFullscreen(
     };
     const refit = () => {
       const dev = deviceRef.current;
-      if (dev && full.current && !busy.current) Object.assign(dev.style, toStyle(fitViewport(aspectRef.current)));
+      if (dev && full.current && !busy.current) Object.assign(dev.style, toStyle(fitViewport(aspectRef.current, fillRef.current)));
     };
     refit();
     document.addEventListener('keydown', onKey);
