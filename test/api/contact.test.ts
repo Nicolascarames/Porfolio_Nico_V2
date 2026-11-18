@@ -68,4 +68,32 @@ describe('POST /api/contact', () => {
     );
     expect(res.statusCode).toBe(200);
   });
+
+  it('rejects non-string fields without crashing', async () => {
+    const { req, res } = mockReqRes({ name: ['x'], email: { a: 1 }, message: 42 });
+    await handler(req, res);
+    expect(res.statusCode).toBe(400);
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an oversized message', async () => {
+    const { req, res } = mockReqRes({ name: 'Nico', email: 'nico@test.com', message: 'a'.repeat(5001) });
+    await handler(req, res);
+    expect(res.statusCode).toBe(400);
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it('strips line breaks from the name used in the subject', async () => {
+    const { req, res } = mockReqRes({ name: 'Nico\r\nBcc: x@y.com', email: 'nico@test.com', message: 'Hola' });
+    await handler(req, res);
+    expect(sendMock).toHaveBeenCalledWith(expect.objectContaining({ subject: expect.not.stringMatching(/[\r\n]/) }));
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('returns 502 when Resend throws', async () => {
+    sendMock.mockRejectedValue(new Error('network'));
+    const { req, res } = mockReqRes({ name: 'Nico', email: 'nico@test.com', message: 'Hola' });
+    await handler(req, res);
+    expect(res.statusCode).toBe(502);
+  });
 });

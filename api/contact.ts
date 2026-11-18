@@ -1,8 +1,17 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Resend } from 'resend';
 
+// Topes para que nadie use el formulario para mandar correos enormes.
+const MAX_NAME = 100;
+const MAX_EMAIL = 254;
+const MAX_MESSAGE = 5000;
+
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function asText(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -11,14 +20,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const { name, email, message } = (req.body ?? {}) as {
-    name?: string;
-    email?: string;
-    message?: string;
-  };
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  // Sin saltos de línea en el nombre: va al asunto del correo.
+  const name = asText(body.name).replace(/[\r\n]+/g, ' ');
+  const email = asText(body.email);
+  const message = asText(body.message);
 
-  if (!name?.trim() || !email?.trim() || !message?.trim()) {
+  if (!name || !email || !message) {
     res.status(400).json({ error: 'Faltan campos obligatorios' });
+    return;
+  }
+  if (name.length > MAX_NAME || email.length > MAX_EMAIL || message.length > MAX_MESSAGE) {
+    res.status(400).json({ error: 'Mensaje demasiado largo' });
     return;
   }
   if (!isValidEmail(email)) {
@@ -28,20 +41,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const to = process.env.CONTACT_TO_EMAIL;
   if (!to) {
-    res.status(500).json({ error: 'CONTACT_TO_EMAIL no configurado' });
+    console.error('CONTACT_TO_EMAIL no configurado');
+    res.status(500).json({ error: 'No se pudo enviar el mensaje' });
     return;
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const { error } = await resend.emails.send({
-    from: process.env.CONTACT_FROM_EMAIL ?? 'onboarding@resend.dev',
-    to,
-    replyTo: email,
-    subject: `Nuevo mensaje de contacto — ${name}`,
-    text: `${message}\n\n— ${name} (${email})`,
-  });
+  // Un fallo de red de Resend (excepción) se responde igual que un error suyo.
+  let failed = false;
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: process.env.CONTACT_FROM_EMAIL ?? 'onboarding@resend.dev',
+      to,
+      replyTo: email,
+      subject: `Nuevo mensaje de contacto — ${name}`,
+      text: `${message}\n\n— ${name} (${email})`,
+    });
+    failed = Boolean(error);
+  } catch {
+    failed = true;
+  }
 
-  if (error) {
+  if (failed) {
     res.status(502).json({ error: 'No se pudo enviar el mensaje' });
     return;
   }
