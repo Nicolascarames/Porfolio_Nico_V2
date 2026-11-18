@@ -61,11 +61,19 @@ export function AboutBadge() {
       const restY = AY + LEN;
       const { p, v } = st;
       if (!st.dragging) {
-        // muelle hacia el reposo + gravedad; la cuerda no se estira más de LEN*1.9
-        v.x += (restX - p.x) * 0.035;
-        v.y += (restY - p.y) * 0.035 + 0.4;
-        v.x *= 0.93;
-        v.y *= 0.93;
+        // muelle suave hacia el reposo + gravedad (G/K ≈ 11 px de caída en reposo);
+        // la cuerda no se estira más de LEN*1.9 y la velocidad tiene tope
+        const K = 0.016;
+        const G = 0.18;
+        const DAMP = 0.9;
+        const VMAX = 14;
+        v.x = (v.x + (restX - p.x) * K) * DAMP;
+        v.y = (v.y + (restY - p.y) * K + G) * DAMP;
+        const speed = Math.hypot(v.x, v.y);
+        if (speed > VMAX) {
+          v.x *= VMAX / speed;
+          v.y *= VMAX / speed;
+        }
         if (reduced) {
           p.x = restX;
           p.y = restY;
@@ -134,6 +142,9 @@ export function AboutBadge() {
   const onPointerUp = () => {
     const st = phys.current;
     st.dragging = false;
+    // soltar con la mitad de la inercia del arrastre: evita el latigazo
+    st.v.x *= 0.5;
+    st.v.y *= 0.5;
     if (st.moved < 6) setFlipped((f) => !f);
   };
 
@@ -141,7 +152,7 @@ export function AboutBadge() {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       setFlipped((f) => !f);
-      phys.current.v.x += 6;
+      phys.current.v.x += 4;
     }
   };
 
