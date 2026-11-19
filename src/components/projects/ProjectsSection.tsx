@@ -1,5 +1,6 @@
 import { projects } from '../../data/projects';
-import { sections } from '../../config/sections';
+import { useSections } from '../../context/SectionsContext';
+import type { SectionsConfig } from '../../config/sections';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { ProjectDeck } from './ProjectDeck';
 import { ProjectCoverflow } from './ProjectCoverflow';
@@ -10,7 +11,7 @@ const VARIANTS = {
   deck: ProjectDeck,
   coverflow: ProjectCoverflow,
   bento: ProjectBento,
-} satisfies Record<typeof sections.projects, (props: ProjectVariantProps) => JSX.Element>;
+} satisfies Record<SectionsConfig['projects'], (props: ProjectVariantProps) => JSX.Element>;
 
 interface ProjectsSectionProps {
   onSelectProject: ProjectVariantProps['onSelectProject'];
@@ -18,6 +19,7 @@ interface ProjectsSectionProps {
 
 /** Sección de proyectos: cabecera común + la variante de config/sections.ts. */
 export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
+  const sections = useSections();
   // En móvil el Coverflow (tarjetas de 380 px girando en 3D) cae a la baraja, más táctil.
   const isMobile = useMediaQuery('(max-width: 820px)');
   const choice = isMobile && sections.projects === 'coverflow' ? 'deck' : sections.projects;

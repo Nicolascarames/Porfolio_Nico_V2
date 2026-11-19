@@ -1,4 +1,5 @@
-import { sections } from '../../config/sections';
+import { useSections } from '../../context/SectionsContext';
+import type { SectionsConfig } from '../../config/sections';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { ContactGlass } from './ContactGlass';
@@ -9,7 +10,7 @@ const VARIANTS = {
   glass: ContactGlass,
   chat: ContactChat,
   terminal: ContactTerminal,
-} satisfies Record<typeof sections.contact, () => JSX.Element>;
+} satisfies Record<SectionsConfig['contact'], () => JSX.Element>;
 
 // Variantes que el visitante puede elegir (el chat solo por config).
 const OPTIONS = [
@@ -25,7 +26,12 @@ const CHOICES = OPTIONS.map((o) => o.value);
  * está 'chat' se muestra el chat sin selector.
  */
 export function ContactSection() {
-  const configured = sections.contact;
+  const configured = useSections().contact;
+  // key: al llegar el valor remoto se remonta para tomar el nuevo defecto (la elección guardada del visitante sigue ganando).
+  return <ContactSectionInner key={configured} configured={configured} />;
+}
+
+function ContactSectionInner({ configured }: { configured: SectionsConfig['contact'] }) {
   const selectable = (CHOICES as readonly string[]).includes(configured);
   const [choice, setChoice] = useStoredChoice<Choice>(
     'r4-contact-variant',

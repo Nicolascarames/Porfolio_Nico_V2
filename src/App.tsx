@@ -8,9 +8,11 @@ import { useProfile } from './auth-kit/hooks/useProfile';
 import { AuthCard } from './auth-kit/components/AuthCard';
 import { ProfilePage } from './auth-kit/components/ProfilePage';
 import { AdminPanel } from './auth-kit/components/AdminPanel';
+import { SectionsEditor } from './auth-kit/components/SectionsEditor';
 import { ServerPanel } from './auth-kit/components/ServerPanel';
 import { PrivateLayout } from './auth-kit/components/PrivateLayout';
 import { HomePage } from './pages/HomePage';
+import { SectionsProvider } from './context/SectionsContext';
 import { Nav } from './components/Nav';
 
 const supabaseClient = createAuthKitClient(authKitConfig.supabase);
@@ -67,14 +69,17 @@ function OwnerRoute({ children, wide = false }: { children: ReactNode; wide?: bo
 export function App() {
   return (
     <KitProvider config={authKitConfig} client={supabaseClient}>
+      <SectionsProvider>
       <Nav />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginRoute />} />
         <Route path="/profile" element={<OwnerRoute><ProfilePage /></OwnerRoute>} />
         <Route path="/admin" element={<OwnerRoute><AdminPanel /></OwnerRoute>} />
+        <Route path="/admin/sections" element={<OwnerRoute><SectionsEditor /></OwnerRoute>} />
         <Route path="/admin/panel" element={<OwnerRoute wide><ServerPanel /></OwnerRoute>} />
       </Routes>
+      </SectionsProvider>
     </KitProvider>
   );
 }

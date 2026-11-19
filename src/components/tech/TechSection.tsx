@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { tech } from '../../data/tech';
-import { sections } from '../../config/sections';
+import { useSections } from '../../context/SectionsContext';
+import type { SectionsConfig } from '../../config/sections';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { TechPhysicsBox } from './TechPhysicsBox';
@@ -12,7 +13,7 @@ const VARIANTS = {
   physics: TechPhysicsBox,
   tower: TechStackTower,
   magnet: TechMagnetCloud,
-} satisfies Record<typeof sections.tech, (props: TechVariantProps) => JSX.Element>;
+} satisfies Record<SectionsConfig['tech'], (props: TechVariantProps) => JSX.Element>;
 
 function renderHead(actions?: ReactNode) {
   return (
@@ -26,7 +27,7 @@ function renderHead(actions?: ReactNode) {
   );
 }
 
-type Choice = typeof sections.tech;
+type Choice = SectionsConfig['tech'];
 const OPTIONS: readonly { value: Choice; label: string }[] = [
   { value: 'physics', label: 'Caja' },
   { value: 'tower', label: 'Torre' },
@@ -36,7 +37,13 @@ const CHOICES = OPTIONS.map((o) => o.value);
 
 /** Sección de tecnologías: el visitante elige variante; config/sections.ts fija la inicial. */
 export function TechSection() {
-  const [choice, setChoice] = useStoredChoice<Choice>('r4-tech-variant', CHOICES, sections.tech);
+  const sections = useSections();
+  // key: al llegar el valor remoto se remonta para tomar el nuevo defecto (la elección guardada del visitante sigue ganando).
+  return <TechSectionInner key={sections.tech} initial={sections.tech} />;
+}
+
+function TechSectionInner({ initial }: { initial: Choice }) {
+  const [choice, setChoice] = useStoredChoice<Choice>('r4-tech-variant', CHOICES, initial);
   const Variant = VARIANTS[choice];
   return (
     <section id="stack" className="border-t border-white/5 py-16 sm:py-[90px]">

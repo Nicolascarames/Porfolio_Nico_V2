@@ -19,14 +19,15 @@ export function PrivateLayout({ children, wide = false }: Props) {
   const isAdmin = !!profile && config.roles.indexOf(profile.role) >= config.roles.indexOf("admin");
 
   const tabClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-[9px] px-4 py-2 text-sm font-medium transition-colors ${
-      isActive ? "bg-white text-black" : "text-white/55 hover:text-white"
+    `rounded-pill px-4 py-2 text-[13px] font-semibold transition-colors ${
+      isActive ? "bg-frost-100 text-on-frost" : "text-ink-muted hover:text-ink"
     }`;
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className={`mx-auto flex w-full ${wide ? "max-w-[max(48rem,50vw)]" : "max-w-3xl"} flex-col gap-6 px-4 py-10 sm:px-8`}>
-        <nav className="flex gap-1 self-start rounded-xl bg-surface p-1">
+    <div className="relative min-h-screen bg-void">
+      <div className="r4-stage-bg" aria-hidden="true" />
+      <div className={`relative z-10 mx-auto flex w-full ${wide ? "max-w-[max(48rem,50vw)]" : "max-w-3xl"} flex-col gap-6 px-4 py-10 sm:px-8`}>
+        <nav className="r4-glass flex flex-wrap gap-1 self-start rounded-pill p-1">
           <NavLink to="/profile" className={tabClass} end>
             Perfil
           </NavLink>
@@ -34,6 +35,9 @@ export function PrivateLayout({ children, wide = false }: Props) {
             <>
               <NavLink to="/admin" className={tabClass} end>
                 Admin
+              </NavLink>
+              <NavLink to="/admin/sections" className={tabClass} end>
+                Secciones
               </NavLink>
               <NavLink to="/admin/panel" className={tabClass} end>
                 Panel

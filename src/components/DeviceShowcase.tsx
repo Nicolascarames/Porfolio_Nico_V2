@@ -3,7 +3,7 @@ import { DeviceFrame } from 'device-frame/react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useDeviceFullscreen, type FullscreenEntry } from '../hooks/useDeviceFullscreen';
 import { HelpModal } from './HelpModal';
-import { sections } from '../config/sections';
+import { useSections } from '../context/SectionsContext';
 import './deviceMock.css';
 
 // /portfolio (no la raíz) es el punto de entrada público de Desktop_Nav: activa
@@ -19,7 +19,6 @@ const PHONE_ASPECT = 2500 / 4722;
 // mock de Claude Design (reality404-v2/components/DeviceFullscreen/preview.html),
 // tablet 4:3 y móvil 1:2, que al ampliar ocupa todo el viewport (bisel → 0).
 // 'real': device-frame de Iphone_Clone, se conserva por si se vuelve a él.
-const MOCK = sections.device === 'mock';
 const MOCK_TABLET_ASPECT = 4 / 3;
 const MOCK_PHONE_ASPECT = 1 / 2;
 
@@ -38,6 +37,7 @@ export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcasePro
   { openProjectId, title = 'reality404' },
   ref,
 ) {
+  const MOCK = useSections().device === 'mock';
   const isMobile = useMediaQuery('(max-width: 820px)');
   const [helpOpen, setHelpOpen] = useState(false);
   const contentUrl = openProjectId ? `${BASE_URL}?open=${encodeURIComponent(openProjectId)}` : BASE_URL;

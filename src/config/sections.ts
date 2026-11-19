@@ -1,12 +1,16 @@
 /**
- * Variante activa de cada sección (rediseño reality404 v2).
- * Proyectos y about se eligen solo aquí. Tech y contacto llevan además un
- * selector visible: aquí se fija la variante con la que arrancan, y la que
+ * Variante por defecto de cada sección (rediseño reality404 v2).
+ * Estos valores son los DEFAULTS: la pestaña de admin /admin/sections los
+ * sobrescribe guardando en la tabla `portfolio.site_config` (fila id=1,
+ * columna `data`), que se lee al cargar el sitio (SectionsContext) y se
+ * cachea en localStorage. Lo que no esté en site_config (o sea inválido)
+ * cae a estos valores. Tech y contacto llevan además un
+ * selector visible: la variante con la que arrancan viene de aquí/admin, y la que
  * elija el visitante se recuerda en su navegador (localStorage), por lo que
  * un cambio aquí no se nota en un navegador que ya eligió otra. Contacto
  * solo ofrece terminal y formulario (glass); con 'chat' no sale selector.
  *
- * ── Cómo cambiar la variante por defecto ─────────────────────────────────
+ * ── Cómo cambiar la variante por defecto (en código) ─────────────────────
  *
  * 1. Busca abajo la sección que quieres cambiar (p. ej. `projects`).
  * 2. Sustituye el valor entre comillas por una de las opciones de su lista.
@@ -19,6 +23,7 @@
  *    puede publicar por error una variante que no existe.
  * 3. Guarda. Con `npm run dev` abierto, el navegador se recarga solo.
  * 4. Para publicarlo: commit + push a main (Vercel despliega solo).
+ *    (Lo normal es cambiarlo desde /admin/sections, sin desplegar.)
  *
  * ── Qué es cada opción ───────────────────────────────────────────────────
  *
@@ -59,11 +64,40 @@
  *   'chat'      Conversación: el formulario pregunta campo a campo.
  *   'terminal'  Terminal: el mensaje se escribe como comandos.
  */
-export const sections = {
-  projects: 'coverflow' as 'deck' | 'coverflow' | 'bento',
-  tech: 'physics' as 'physics' | 'tower' | 'magnet',
-  about: 'badge' as 'badge' | 'bento' | 'terminal',
-  aboutTerminal: true as boolean,
-  contact: 'terminal' as 'glass' | 'chat' | 'terminal',
-  device: 'mock' as 'mock' | 'real',
+export const SECTION_OPTIONS = {
+  projects: ['deck', 'coverflow', 'bento'],
+  tech: ['physics', 'tower', 'magnet'],
+  about: ['badge', 'bento', 'terminal'],
+  contact: ['glass', 'chat', 'terminal'],
+  device: ['mock', 'real'],
+} as const;
+
+type OptionKey = keyof typeof SECTION_OPTIONS;
+
+export type SectionsConfig = {
+  [K in OptionKey]: (typeof SECTION_OPTIONS)[K][number];
+} & { aboutTerminal: boolean };
+
+export const DEFAULT_SECTIONS: SectionsConfig = {
+  projects: 'coverflow',
+  tech: 'physics',
+  about: 'badge',
+  aboutTerminal: true,
+  contact: 'terminal',
+  device: 'mock',
 };
+
+/** Fusiona un valor desconocido (JSON de site_config) sobre los defaults, aceptando solo valores válidos. */
+export function parseSections(raw: unknown): SectionsConfig {
+  const out: SectionsConfig = { ...DEFAULT_SECTIONS };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+  const src = raw as Record<string, unknown>;
+  for (const key of Object.keys(SECTION_OPTIONS) as OptionKey[]) {
+    const v = src[key];
+    if (typeof v === 'string' && (SECTION_OPTIONS[key] as readonly string[]).includes(v)) {
+      (out as Record<string, unknown>)[key] = v;
+    }
+  }
+  if (typeof src.aboutTerminal === 'boolean') out.aboutTerminal = src.aboutTerminal;
+  return out;
+}

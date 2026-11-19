@@ -1,4 +1,5 @@
-import { sections } from '../../config/sections';
+import { useSections } from '../../context/SectionsContext';
+import type { SectionsConfig } from '../../config/sections';
 import { AboutBadge } from './AboutBadge';
 import { AboutBento } from './AboutBento';
 import { AboutConsole } from './AboutConsole';
@@ -8,10 +9,11 @@ const VARIANTS = {
   badge: AboutBadge,
   bento: AboutBento,
   terminal: AboutTerminal,
-} satisfies Record<typeof sections.about, () => JSX.Element>;
+} satisfies Record<SectionsConfig['about'], () => JSX.Element>;
 
 /** Sección "Sobre mí": la variante de config/sections.ts (+ terminal con IA si aboutTerminal). */
 export function AboutSection() {
+  const sections = useSections();
   const Variant = VARIANTS[sections.about];
   return (
     <section id="sobre-mi" className="border-t border-white/5 py-16 sm:py-[90px]">
