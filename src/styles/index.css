@@ -100,4 +100,8 @@ a:hover { color: #ffffff; }
 a.nav-cta, a.nav-cta:hover, button.nav-cta {
   color: var(--color-bg);
 }
+/* Same issue for the active private-area tab (frost pill, PrivateLayout). */
+a.r4-tab[aria-current="page"], a.r4-tab[aria-current="page"]:hover {
+  color: var(--color-on-frost);
+}
 input::placeholder, textarea::placeholder { color: #6b6b66; }

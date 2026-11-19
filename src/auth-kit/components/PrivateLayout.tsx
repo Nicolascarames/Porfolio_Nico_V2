@@ -19,7 +19,7 @@ export function PrivateLayout({ children, wide = false }: Props) {
   const isAdmin = !!profile && config.roles.indexOf(profile.role) >= config.roles.indexOf("admin");
 
   const tabClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-pill px-4 py-2 text-[13px] font-semibold transition-colors ${
+    `r4-tab rounded-pill px-4 py-2 text-[13px] font-semibold transition-colors ${
       isActive ? "bg-frost-100 text-on-frost" : "text-ink-muted hover:text-ink"
     }`;
 
@@ -38,6 +38,9 @@ export function PrivateLayout({ children, wide = false }: Props) {
               </NavLink>
               <NavLink to="/admin/sections" className={tabClass} end>
                 Secciones
+              </NavLink>
+              <NavLink to="/admin/ai" className={tabClass} end>
+                IA
               </NavLink>
               <NavLink to="/admin/panel" className={tabClass} end>
                 Panel

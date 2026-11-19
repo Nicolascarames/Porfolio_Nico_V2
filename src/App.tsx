@@ -9,6 +9,7 @@ import { AuthCard } from './auth-kit/components/AuthCard';
 import { ProfilePage } from './auth-kit/components/ProfilePage';
 import { AdminPanel } from './auth-kit/components/AdminPanel';
 import { SectionsEditor } from './auth-kit/components/SectionsEditor';
+import { AiConfigEditor } from './auth-kit/components/AiConfigEditor';
 import { ServerPanel } from './auth-kit/components/ServerPanel';
 import { PrivateLayout } from './auth-kit/components/PrivateLayout';
 import { HomePage } from './pages/HomePage';
@@ -77,6 +78,7 @@ export function App() {
         <Route path="/profile" element={<OwnerRoute><ProfilePage /></OwnerRoute>} />
         <Route path="/admin" element={<OwnerRoute><AdminPanel /></OwnerRoute>} />
         <Route path="/admin/sections" element={<OwnerRoute><SectionsEditor /></OwnerRoute>} />
+        <Route path="/admin/ai" element={<OwnerRoute><AiConfigEditor /></OwnerRoute>} />
         <Route path="/admin/panel" element={<OwnerRoute wide><ServerPanel /></OwnerRoute>} />
       </Routes>
       </SectionsProvider>
