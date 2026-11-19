@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { projects } from '../../data/projects';
 import { tech } from '../../data/tech';
-import { useInView } from '../../hooks/useInView';
 import { prefersReducedMotion } from '../../hooks/useReducedMotion';
 import { scrollToId } from '../../lib/scroll';
 import { createTerminalAi, terminalAiAvailable } from '../../lib/terminalAi';
@@ -10,7 +9,7 @@ import logo404 from '../../assets/brand/logo-404-cuadrado.png';
 import './about.css';
 
 /**
- * Terminal de vidrio que escribe sola una sesión y luego acepta comandos.
+ * Terminal de vidrio que arranca vacía y acepta comandos.
  * Port de Diseño_claude_desing/reality404-v2/components/AboutTerminal/preview.html.
  * El texto del visitante se renderiza siempre como nodo de texto de React (escapado).
  */
@@ -83,7 +82,6 @@ const notFound = () => (
 );
 
 const CHIPS = ['whoami', 'cat sobre-mi.txt', 'ls stack/', 'ls proyectos/', 'status', 'help', 'clear'];
-const SCRIPT = ['whoami', 'cat sobre-mi.txt', 'status'];
 
 interface Line {
   id: number;
@@ -98,18 +96,26 @@ export function AboutTerminal() {
   const outRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [lines, setLines] = useState<Line[]>(() => [mk(ART, 'art'), mk('\u00a0')]);
-  const [typing, setTyping] = useState<string | null>(null);
   const [value, setValue] = useState('');
   const [stream, setStream] = useState<string | null>(null); // texto de la IA en curso ('' = pensando)
   const busyRef = useRef(false);
   const bridgeRef = useRef<ChatLlmBridge | null>(null);
-  const visible = useInView(outRef, { once: true });
+  const refocusRef = useRef(false); // el input tenía el foco al empezar a responder la IA
 
   // Mantiene la salida pegada al final (sin scrollIntoView: no mueve la página).
   useEffect(() => {
     const el = outRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [lines, typing, stream]);
+  }, [lines, stream]);
+
+  // Al volver el prompt tras la IA, recupera el foco solo si lo tenía (sin robar el de la página).
+  const busy = stream !== null;
+  useEffect(() => {
+    if (!busy && refocusRef.current) {
+      refocusRef.current = false;
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, [busy]);
 
   const print = useCallback((...ls: Line[]) => setLines((cur) => [...cur, ...ls]), []);
 
@@ -146,6 +152,7 @@ export function AboutTerminal() {
         return;
       }
       busyRef.current = true;
+      refocusRef.current = document.activeElement === inputRef.current;
       setStream('');
       void getBridge().send(prompt);
     },
@@ -181,58 +188,8 @@ export function AboutTerminal() {
     [print, askAi],
   );
 
-  // Intro: sesión escrita sola, arranca al entrar en pantalla.
-  useEffect(() => {
-    if (!visible) return;
-    const reduced = prefersReducedMotion();
-    let cancelled = false;
-    const timers = new Set<ReturnType<typeof setTimeout>>();
-    const later = (fn: () => void, ms: number) => {
-      const id = setTimeout(() => {
-        timers.delete(id);
-        if (!cancelled) fn();
-      }, ms);
-      timers.add(id);
-    };
-
-    if (reduced) {
-      // Estado final directo, sin escribir carácter a carácter.
-      SCRIPT.forEach((c) => run(c, true));
-      print(mk('\u00a0'), mk(<>escribe <Hi>help</Hi> o pulsa un comando ↓</>));
-      return;
-    }
-
-    let si = 0;
-    const typeNext = () => {
-      if (si >= SCRIPT.length) {
-        print(mk('\u00a0'), mk(<>escribe <Hi>help</Hi> o pulsa un comando ↓</>));
-        return;
-      }
-      const cmd = SCRIPT[si++];
-      let k = 0;
-      const t = () => {
-        if (k <= cmd.length) {
-          setTyping(cmd.slice(0, k++));
-          later(t, 55 + Math.random() * 40);
-        } else {
-          setTyping(null);
-          run(cmd, true);
-          later(typeNext, 500);
-        }
-      };
-      t();
-    };
-    later(typeNext, 400);
-
-    return () => {
-      cancelled = true;
-      timers.forEach(clearTimeout);
-      setTyping(null);
-    };
-  }, [visible, run, print]);
-
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return;
+    if (e.key !== 'Enter' || busyRef.current) return;
     const v = value;
     setValue('');
     run(v, true);
@@ -259,13 +216,6 @@ export function AboutTerminal() {
               {l.node}
             </div>
           ))}
-          {typing !== null && (
-            <div className="ln">
-              {PS}
-              <span className="cmd">{typing}</span>
-              <span className="at-caret" />
-            </div>
-          )}
           {stream !== null && (
             <div className="ln ai">
               {stream === '' ? (
@@ -278,18 +228,20 @@ export function AboutTerminal() {
               )}
             </div>
           )}
-          <div className="at-line">
-            {PS}
-            <input
-              ref={inputRef}
-              aria-label="Escribe un comando"
-              autoComplete="off"
-              spellCheck={false}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={onKeyDown}
-            />
-          </div>
+          {!busy && (
+            <div className="at-line">
+              {PS}
+              <input
+                ref={inputRef}
+                aria-label="Escribe un comando"
+                autoComplete="off"
+                spellCheck={false}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={onKeyDown}
+              />
+            </div>
+          )}
         </div>
         <div className="at-chips">
           {CHIPS.map((c) => (
@@ -297,6 +249,7 @@ export function AboutTerminal() {
               key={c}
               type="button"
               onClick={() => {
+                if (busyRef.current) return;
                 run(c, true);
                 inputRef.current?.focus({ preventScroll: true });
               }}

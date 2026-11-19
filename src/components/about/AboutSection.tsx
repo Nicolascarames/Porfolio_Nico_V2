@@ -1,6 +1,7 @@
 import { sections } from '../../config/sections';
 import { AboutBadge } from './AboutBadge';
 import { AboutBento } from './AboutBento';
+import { AboutConsole } from './AboutConsole';
 import { AboutTerminal } from './AboutTerminal';
 
 const VARIANTS = {
@@ -18,7 +19,7 @@ export function AboutSection() {
         <Variant />
         {sections.aboutTerminal && sections.about !== 'terminal' && (
           <div className="mt-12 sm:mt-16">
-            <AboutTerminal />
+            <AboutConsole />
           </div>
         )}
       </div>
