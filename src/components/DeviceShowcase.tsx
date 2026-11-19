@@ -9,7 +9,7 @@ import './deviceMock.css';
 // /portfolio (no la raíz) es el punto de entrada público de Desktop_Nav: activa
 // guestMode y no exige login. También lee ?open=<id> para abrir ese proyecto
 // directamente en la ventana "Navegador" (ver PortfolioEntry.tsx en ese repo).
-const BASE_URL = 'https://desktop-nav.vercel.app/portfolio';
+const BASE_URL = 'https://desktop.reality404.app/portfolio';
 
 // Proporciones exactas de Iphone_Clone/src/geometry.ts (ancho / alto).
 const TABLET_ASPECT = 1195 / 960;
