@@ -66,7 +66,7 @@ export const DeviceShowcase = forwardRef<DeviceShowcaseHandle, DeviceShowcasePro
       : 'min(85vw, 1800px, calc(100vh * 1195 / 960))';
 
   return (
-    <section className="flex flex-col items-center py-12 sm:py-20">
+    <section className="flex flex-col items-center py-12 sm:py-20 min-[938px]:py-6">
       <div style={{ width: maxWidth }}>
         {/* Hueco que conserva el tamaño mientras el dispositivo está ampliado. */}
         <div ref={slotRef}>
