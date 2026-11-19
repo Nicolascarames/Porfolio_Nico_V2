@@ -168,11 +168,29 @@ export function useDeviceFullscreen(
       const dev = deviceRef.current;
       if (dev && full.current && !busy.current) Object.assign(dev.style, toStyle(fitViewport(aspectRef.current, fillRef.current)));
     };
+    // Con el foco dentro del iframe, Esc no llega aquí: el contenido (Desktop_Nav
+    // keyBridge) lo reenvía por postMessage. Se valida event.source contra el
+    // contentWindow del iframe (directo o dentro del shadowRoot de <device-frame>).
+    const onMessage = (e: MessageEvent) => {
+      const d = e.data;
+      if (!d || d.source !== 'device-frame-content' || d.type !== 'key' || d.key !== 'Escape') return;
+      const dev = deviceRef.current;
+      if (!dev || !e.source) return;
+      const roots: ParentNode[] = [dev];
+      if (dev.shadowRoot) roots.push(dev.shadowRoot);
+      dev.querySelectorAll('device-frame').forEach((f) => f.shadowRoot && roots.push(f.shadowRoot));
+      const ok = roots.some((r) =>
+        Array.from(r.querySelectorAll('iframe')).some((f) => f.contentWindow === e.source),
+      );
+      if (ok) collapse();
+    };
     refit();
     document.addEventListener('keydown', onKey);
+    window.addEventListener('message', onMessage);
     window.addEventListener('resize', refit);
     return () => {
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('message', onMessage);
       window.removeEventListener('resize', refit);
     };
   }, [isFull, aspect, collapse, deviceRef]);
