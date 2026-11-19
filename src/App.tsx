@@ -1,51 +1,67 @@
-import type { ReactNode } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { authKitConfig } from './auth-kit/config/kit.config';
 import { createAuthKitClient } from './auth-kit/lib/supabaseClient';
-import { KitProvider } from './auth-kit/context/KitProvider';
+import { KitProvider, useAuthKitConfig } from './auth-kit/context/KitProvider';
 import { useAuth } from './auth-kit/hooks/useAuth';
+import { useProfile } from './auth-kit/hooks/useProfile';
 import { AuthCard } from './auth-kit/components/AuthCard';
 import { ProfilePage } from './auth-kit/components/ProfilePage';
 import { AdminPanel } from './auth-kit/components/AdminPanel';
 import { ServerPanel } from './auth-kit/components/ServerPanel';
-import { RoleGate } from './auth-kit/components/RoleGate';
 import { PrivateLayout } from './auth-kit/components/PrivateLayout';
 import { HomePage } from './pages/HomePage';
 import { Nav } from './components/Nav';
 
 const supabaseClient = createAuthKitClient(authKitConfig.supabase);
 
+// Owner-only area: the Supabase project is shared with Desktop_Nav (public
+// signup), so any account can authenticate here. Only role "admin" gets in;
+// everyone else is signed out and sent to /login with a notice.
+function useIsOwner() {
+  const { config } = useAuthKitConfig();
+  const { profile, loading } = useProfile();
+  const isOwner = !!profile && config.roles.indexOf(profile.role) >= config.roles.indexOf('admin');
+  return { isOwner, loading };
+}
+
 function LoginRoute() {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (user) return <Navigate to="/profile" replace />;
-  return <AuthCard />;
+  const { user, loading, signOut } = useAuth();
+  const { isOwner, loading: profileLoading } = useIsOwner();
+  const location = useLocation();
+  const [denied, setDenied] = useState(
+    (location.state as { denied?: boolean } | null)?.denied === true
+  );
+  const reject = !!user && !loading && !profileLoading && !isOwner;
+
+  useEffect(() => {
+    if (!reject) return;
+    setDenied(true);
+    signOut().catch(() => {});
+  }, [reject, signOut]);
+
+  if (loading || (user && profileLoading)) return null;
+  if (user && isOwner) return <Navigate to="/profile" replace />;
+  if (user) return null; // non-owner, sign-out in flight
+  return <AuthCard notice={denied ? 'Acceso restringido.' : undefined} />;
 }
 
-function ProfileRoute() {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  return (
-    <PrivateLayout>
-      <ProfilePage />
-    </PrivateLayout>
-  );
-}
+// Gate for every private route (profile, admin, panel). RoleGate/RLS stay as
+// the inner layers; this one also signs non-admin sessions out.
+function OwnerRoute({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+  const { user, loading, signOut } = useAuth();
+  const { isOwner, loading: profileLoading } = useIsOwner();
+  const reject = !!user && !loading && !profileLoading && !isOwner;
 
-// Admin-only pages. RoleGate is UX; the real protection is RLS on the data
-// (admin_list_users / admin_panel only answer to portfolio.is_admin()).
-function AdminRoute({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
-  const { user, loading } = useAuth();
+  useEffect(() => {
+    if (reject) signOut().catch(() => {});
+  }, [reject, signOut]);
+
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  return (
-    <PrivateLayout wide={wide}>
-      <RoleGate minRole="admin" fallback={<p className="text-white/50">Solo admin.</p>}>
-        {children}
-      </RoleGate>
-    </PrivateLayout>
-  );
+  if (profileLoading) return null;
+  if (!isOwner) return <Navigate to="/login" replace state={{ denied: true }} />;
+  return <PrivateLayout wide={wide}>{children}</PrivateLayout>;
 }
 
 export function App() {
@@ -55,9 +71,9 @@ export function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginRoute />} />
-        <Route path="/profile" element={<ProfileRoute />} />
-        <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-        <Route path="/admin/panel" element={<AdminRoute wide><ServerPanel /></AdminRoute>} />
+        <Route path="/profile" element={<OwnerRoute><ProfilePage /></OwnerRoute>} />
+        <Route path="/admin" element={<OwnerRoute><AdminPanel /></OwnerRoute>} />
+        <Route path="/admin/panel" element={<OwnerRoute wide><ServerPanel /></OwnerRoute>} />
       </Routes>
     </KitProvider>
   );

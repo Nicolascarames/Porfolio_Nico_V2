@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { scrollToId } from '../lib/scroll';
 import { useAuth } from '../auth-kit/hooks/useAuth';
 
@@ -35,6 +35,12 @@ export function Nav() {
             >
               Sobre mí
             </button>
+            <Link
+              to={user ? '/profile' : '/login'}
+              className="text-sm font-semibold text-neutral-300 hover:text-white"
+            >
+              Private
+            </Link>
           </>
         )}
         {!loading && user && (
