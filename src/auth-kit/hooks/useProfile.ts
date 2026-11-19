@@ -28,11 +28,17 @@ export function useProfile(): UseProfileResult {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  // Which user id the current `profile`/`loading` state belongs to. When
+  // `user` changes (null -> signed in), there is one render before the effect
+  // re-runs `refresh` where `loading` is still false from the null-user pass;
+  // without this, gates read "loaded, no profile" and reject the session.
+  const [loadedFor, setLoadedFor] = useState<string | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) {
       setProfile(null);
+      setLoadedFor(null);
       setLoading(false);
       return;
     }
@@ -64,6 +70,7 @@ export function useProfile(): UseProfileResult {
       setProfile(data as Profile);
       setError(null);
     }
+    setLoadedFor(user.id);
     setLoading(false);
   }, [client, user]);
 
@@ -110,5 +117,6 @@ export function useProfile(): UseProfileResult {
     [client]
   );
 
-  return { profile, loading, error, updateUsername, uploadAvatar, changeEmail, refresh };
+  const stale = loadedFor !== (user?.id ?? null);
+  return { profile: stale ? null : profile, loading: loading || stale, error, updateUsername, uploadAvatar, changeEmail, refresh };
 }
