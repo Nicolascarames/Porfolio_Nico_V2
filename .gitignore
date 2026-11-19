@@ -6,3 +6,6 @@ supabase/.temp
 
 # Capturas y logs de Playwright MCP
 .playwright-mcp
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
