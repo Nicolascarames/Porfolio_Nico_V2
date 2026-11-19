@@ -64,27 +64,28 @@ export function AdminPanel() {
   }, [users, search]);
 
   if (loading) {
-    return <div className="p-6 text-white/50">Loading…</div>;
+    return <div className="p-6 text-ink-muted">Loading…</div>;
   }
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-[28px] border border-white/10 bg-surface p-8 shadow-card">
-      <h2 className="text-xl font-semibold text-white">Users</h2>
-      {error && <p className="text-sm text-red-300">{error}</p>}
+    <div className="r4-glass flex w-full flex-col gap-3 rounded-r4-xl p-6 sm:p-8">
+      <p className="r4-eyebrow">Admin</p>
+      <h2 className="r4-title mb-2 text-3xl text-ink">Usuarios</h2>
+      {error && <p className="text-sm text-signal-error">{error}</p>}
       <div className="relative w-full max-w-xs">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or email"
           aria-label="Search users"
-          className="h-10 w-full rounded-md border border-white/10 bg-brand-gray pl-9 pr-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+          className="h-10 w-full rounded-r4-md border border-glass-edge bg-glass pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint focus:border-frost-100 focus:outline-none focus:ring-2 focus:ring-focus-ring"
         />
       </div>
-      <table className="w-full text-left text-sm text-white">
+      <table className="w-full text-left text-sm text-ink">
         <thead>
-          <tr className="text-white/40">
+          <tr className="text-ink-faint">
             <th className="pb-2 font-normal">User</th>
             <th className="pb-2 font-normal">Email</th>
             <th className="pb-2 font-normal">Role</th>
@@ -95,16 +96,16 @@ export function AdminPanel() {
             const isSelf = u.id === user?.id;
             const displayName = u.full_name || u.username || u.id;
             return (
-              <tr key={u.id} className="border-t border-white/10">
+              <tr key={u.id} className="border-t border-glass-edge">
                 <td className="py-2">{displayName}</td>
-                <td className="text-white/70">{u.email ?? "—"}</td>
+                <td className="text-ink-muted">{u.email ?? "—"}</td>
                 <td>
                   <select
                     value={u.role}
                     disabled={isSelf}
                     aria-label={`Role for ${displayName}`}
                     onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                    className="rounded-md border border-white/10 bg-surface px-2 py-1 disabled:opacity-50"
+                    className="rounded-r4-sm border border-glass-edge bg-glass px-2 py-1 text-ink focus:outline-none focus:ring-2 focus:ring-focus-ring disabled:opacity-50"
                   >
                     {config.roles.map((role) => (
                       <option key={role} value={role}>
@@ -118,7 +119,7 @@ export function AdminPanel() {
           })}
           {filtered.length === 0 && (
             <tr>
-              <td colSpan={3} className="py-4 text-center text-white/40">
+              <td colSpan={3} className="py-4 text-center text-ink-faint">
                 No users match “{search}”.
               </td>
             </tr>

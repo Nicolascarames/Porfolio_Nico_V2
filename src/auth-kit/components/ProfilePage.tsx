@@ -2,8 +2,9 @@ import { ProfileForm } from "./ProfileForm";
 
 export function ProfilePage() {
   return (
-    <div className="w-full max-w-lg rounded-[28px] border border-white/10 bg-surface p-8 shadow-card">
-      <h1 className="mb-6 text-2xl font-semibold text-white">Your profile</h1>
+    <div className="r4-glass w-full max-w-lg rounded-r4-xl p-6 sm:p-8">
+      <p className="r4-eyebrow mb-2">Cuenta</p>
+      <h1 className="r4-title mb-6 text-3xl text-ink">Your profile</h1>
       <ProfileForm />
     </div>
   );
