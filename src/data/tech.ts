@@ -20,4 +20,9 @@ export const tech: Tech[] = [
   { name: 'Selenium', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/selenium/selenium-original.svg' },
   { name: 'Figma', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/figma/figma-original.svg' },
   { name: 'GitHub', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/github/github-original.svg' },
+  { name: 'Playwright', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/playwright/playwright-original.svg' },
+  { name: 'Java', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/java/java-original.svg' },
+  { name: 'GitHub Actions', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/githubactions/githubactions-original.svg' },
+  { name: 'Grafana', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/grafana/grafana-original.svg' },
+  { name: 'Postman', src: 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/postman/postman-original.svg' },
 ];

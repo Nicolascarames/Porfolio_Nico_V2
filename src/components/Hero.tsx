@@ -11,9 +11,9 @@ export function Hero() {
         </h1>
       </div>
       <p className="mt-7 max-w-[560px] text-pretty text-base leading-relaxed text-neutral-400 sm:mt-13 sm:text-lg">
-        Construyo productos digitales de principio a fin: interfaces limpias, código
-        mantenible y experiencias potenciadas por inteligencia artificial. Combino desarrollo,
-        QA y automatización de flujos de trabajo para lanzar más rápido y con mayor calidad.
+        QA Engineer · Automatización · Arquitectura. Construyo productos digitales de principio
+        a fin y aseguro su calidad: automatización de pruebas, integraciones y CI/CD, con
+        inteligencia artificial para lanzar más rápido y con mayor calidad.
       </p>
     </section>
   );

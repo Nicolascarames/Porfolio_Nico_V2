@@ -17,10 +17,10 @@ const AY = -10;
 
 const BACK_ROWS: [string, string][] = [
   ['BASE', 'A Coruña, España'],
-  ['ROL', 'Developer con foco en calidad'],
-  ['CICLO', 'Código → QA → lanzamiento'],
+  ['ROL', 'QA Engineer · Automatización · Arquitectura'],
+  ['CICLO', 'Revisión → pruebas → producción'],
   ['EXTRA', 'Workflows y automatización con IA'],
-  ['STACK', 'React · TypeScript · Node · Python'],
+  ['STACK', 'Playwright · Python · TypeScript · Java'],
 ];
 
 export function AboutBadge() {
@@ -219,7 +219,7 @@ export function AboutBadge() {
                 <img src={nicoImg} alt="Foto de Nico" draggable={false} />
               </div>
               <div className="ab-name r4-frost-text">Nico</div>
-              <div className="ab-role">Developer · QA · Workflows con IA</div>
+              <div className="ab-role">QA Engineer · Automatización · Arquitectura</div>
               <div className="ab-live">Disponible para proyectos</div>
             </div>
             <div className="ab-face ab-back r4-glass">
@@ -246,12 +246,14 @@ export function AboutBadge() {
           funciona de verdad.
         </h2>
         <p>
-          Soy <strong>developer</strong> con foco en calidad. Trabajo el ciclo completo: escribo
-          código, hago <strong>QA</strong> y aseguro que lo que se lanza funciona de verdad.
+          Soy <strong>QA Engineer</strong> con perfil SDET y más de 3 años en desarrollo,
+          automatización e integraciones. En Inditex (Minsait) soy el <strong>quality gate</strong>{' '}
+          de varios equipos: reviso, pruebo y valido su código antes de producción.
         </p>
         <p>
-          Diseño y automatizo <strong>workflows</strong> y aprovecho la <strong>IA</strong> para
-          acelerar cada etapa del desarrollo sin perder control ni criterio.
+          Automatizo con <strong>Playwright</strong>, Python, TypeScript y Java, hago pruebas de
+          rendimiento y despliego con <strong>CI/CD</strong>. Uso la <strong>IA</strong> para
+          acelerar cada etapa sin perder control ni criterio.
         </p>
         <div className="r4-hint">Tira de la credencial · clic para ver el reverso</div>
       </div>

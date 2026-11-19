@@ -12,7 +12,7 @@ import './about.css';
  * Diseño_claude_desing/reality404-v2/components/AboutBento/preview.html.
  */
 
-const STEPS = ['Código', 'QA', 'Workflow IA', 'Lanzar'];
+const STEPS = ['Código', 'QA', 'CI/CD', 'Lanzar'];
 const fmt = new Intl.DateTimeFormat('es-ES', {
   timeZone: 'Europe/Madrid',
   hour: '2-digit',
@@ -92,10 +92,11 @@ export function AboutBento() {
         <Cell className="abt-bio">
           <div className="abt-k">bio</div>
           <p>
-            Soy <strong>developer</strong> con foco en calidad. Trabajo el ciclo completo: escribo
-            código, hago <strong>QA</strong> y aseguro que lo que se lanza funciona de verdad.
-            Diseño y automatizo <strong>workflows</strong> y aprovecho la <strong>IA</strong> para
-            acelerar cada etapa del desarrollo sin perder control ni criterio.
+            Soy <strong>QA Engineer</strong> con perfil SDET y más de 3 años en desarrollo,
+            automatización e integraciones. En Inditex (Minsait) soy el <strong>quality gate</strong>{' '}
+            de varios equipos: reviso, pruebo y valido su código antes de producción. Automatizo
+            con <strong>Playwright</strong>, Python, TypeScript y Java, y uso la <strong>IA</strong>{' '}
+            para acelerar cada etapa sin perder control ni criterio.
           </p>
         </Cell>
         <Cell>
