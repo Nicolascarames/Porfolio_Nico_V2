@@ -127,3 +127,8 @@
 @media (prefers-reduced-motion: reduce) {
   .at-caret { animation: none; }
 }
+
+/* Respuesta de la IA en la terminal */
+.at-out .ln.ai { white-space: pre-wrap; }
+.at-think { opacity: 0.7; }
+.at-think .at-caret { margin-left: 4px; }

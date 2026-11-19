@@ -9,13 +9,18 @@ const VARIANTS = {
   terminal: AboutTerminal,
 } satisfies Record<typeof sections.about, () => JSX.Element>;
 
-/** Sección "Sobre mí": la variante de config/sections.ts. */
+/** Sección "Sobre mí": la variante de config/sections.ts (+ terminal con IA si aboutTerminal). */
 export function AboutSection() {
   const Variant = VARIANTS[sections.about];
   return (
     <section id="sobre-mi" className="border-t border-white/5 py-16 sm:py-[90px]">
       <div className="mx-auto max-w-[1200px] px-5 sm:px-[60px]">
         <Variant />
+        {sections.aboutTerminal && sections.about !== 'terminal' && (
+          <div className="mt-12 sm:mt-16">
+            <AboutTerminal />
+          </div>
+        )}
       </div>
     </section>
   );

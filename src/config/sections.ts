@@ -51,6 +51,9 @@
  *   'real'      Tablet/iPhone de Iphone_Clone (device-frame), con su puente de
  *               rueda del ratón. Ampliado se centra conservando el marco.
  *
+ * aboutTerminal (true/false): añade la terminal con IA debajo de la variante de
+ *   "Sobre mí" (se ignora si about ya es 'terminal').
+ *
  * contact (sección "Contacto"; las tres envían de verdad a /api/contact):
  *   'glass'     Formulario de vidrio clásico (nombre, email, mensaje).
  *   'chat'      Conversación: el formulario pregunta campo a campo.
@@ -60,6 +63,7 @@ export const sections = {
   projects: 'coverflow' as 'deck' | 'coverflow' | 'bento',
   tech: 'physics' as 'physics' | 'tower' | 'magnet',
   about: 'badge' as 'badge' | 'bento' | 'terminal',
+  aboutTerminal: true as boolean,
   contact: 'terminal' as 'glass' | 'chat' | 'terminal',
   device: 'mock' as 'mock' | 'real',
 };

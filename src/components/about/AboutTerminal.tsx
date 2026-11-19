@@ -4,6 +4,8 @@ import { tech } from '../../data/tech';
 import { useInView } from '../../hooks/useInView';
 import { prefersReducedMotion } from '../../hooks/useReducedMotion';
 import { scrollToId } from '../../lib/scroll';
+import { createTerminalAi, terminalAiAvailable } from '../../lib/terminalAi';
+import type { ChatLlmBridge } from '../../lib/chat-llm-bridge/chat-client';
 import logo404 from '../../assets/brand/logo-404-cuadrado.png';
 import './about.css';
 
@@ -21,20 +23,28 @@ const PS = <span className="ps">reality404 ~ $ </span>;
 const CMDS: Record<string, () => ReactNode[]> = {
   whoami: () => [
     <>
-      <Hi>Nico</Hi> — developer, design and workflows with AI
+      <Hi>Nico</Hi> — QA Engineer · Automatización · Arquitectura
     </>,
   ],
   'cat sobre-mi.txt': () => [
     <>
-      Soy <Hi>developer</Hi> con foco en calidad. Trabajo el ciclo completo:
+      Soy <Hi>QA Engineer</Hi> con más de 3 años en desarrollo, automatización e integraciones.
     </>,
     <>
-      escribo código, hago <Hi>QA</Hi> y aseguro que lo que se lanza funciona de verdad.
+      Ahora soy Arquitecto de Software en <Hi>Minsait (Indra)</Hi> para Inditex.
     </>,
     <>
-      Diseño y automatizo <Hi>workflows</Hi> y aprovecho la <Hi>IA</Hi> para acelerar
+      Actúo como <Hi>quality gate</Hi>: reviso, pruebo y valido el código antes de producción.
     </>,
-    'cada etapa del desarrollo sin perder control ni criterio.',
+    <>
+      Automatizo con <Hi>Python</Hi>, <Hi>TypeScript</Hi> y <Hi>Java</Hi>. E2E con <Hi>Playwright</Hi>.
+    </>,
+    <>
+      Rendimiento con <Hi>k6</Hi> y Grafana. CI/CD con <Hi>GitHub Actions</Hi>.
+    </>,
+    <>
+      Integro con <Hi>IBM ACE</Hi> e <Hi>IBM MQ</Hi>. Preparando ISTQB CTFL.
+    </>,
   ],
   'ls stack/': () => [tech.map((t) => t.name).join('  ')],
   'ls proyectos/': () => [
@@ -49,16 +59,28 @@ const CMDS: Record<string, () => ReactNode[]> = {
   ],
   status: () => [
     <>
-      <span className="ok">●</span> Disponible para proyectos · A Coruña, ES
+      <span className="ok">●</span> QA Engineer en Minsait (Indra) · Preparando ISTQB CTFL · A Coruña, ES
     </>,
   ],
-  help: () => ['comandos: whoami · cat sobre-mi.txt · ls stack/ · ls proyectos/ · status · contacto · clear'],
+  help: () => [
+    'comandos: whoami · cat sobre-mi.txt · ls stack/ · ls proyectos/ · status · contacto · clear',
+    <>
+      también puedes <Hi>preguntarme lo que quieras</Hi>: escribe una frase y te responde la IA.
+    </>,
+  ],
   contacto: () => [
     <>
       → baja a <Hi>#contacto</Hi> o escribe <Hi>hola</Hi> en el formulario 404
     </>,
   ],
 };
+
+const NO_AI = 'IA no disponible ahora mismo';
+const notFound = () => (
+  <>
+    comando no encontrado — error 404, prueba <Hi>help</Hi>
+  </>
+);
 
 const CHIPS = ['whoami', 'cat sobre-mi.txt', 'ls stack/', 'ls proyectos/', 'status', 'help', 'clear'];
 const SCRIPT = ['whoami', 'cat sobre-mi.txt', 'status'];
@@ -78,15 +100,57 @@ export function AboutTerminal() {
   const [lines, setLines] = useState<Line[]>(() => [mk(ART, 'art'), mk('\u00a0')]);
   const [typing, setTyping] = useState<string | null>(null);
   const [value, setValue] = useState('');
+  const [stream, setStream] = useState<string | null>(null); // texto de la IA en curso ('' = pensando)
+  const busyRef = useRef(false);
+  const bridgeRef = useRef<ChatLlmBridge | null>(null);
   const visible = useInView(outRef, { once: true });
 
   // Mantiene la salida pegada al final (sin scrollIntoView: no mueve la página).
   useEffect(() => {
     const el = outRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [lines, typing]);
+  }, [lines, typing, stream]);
 
   const print = useCallback((...ls: Line[]) => setLines((cur) => [...cur, ...ls]), []);
+
+  const getBridge = useCallback(() => {
+    if (!bridgeRef.current) {
+      const reduced = prefersReducedMotion();
+      bridgeRef.current = createTerminalAi({
+        // Con movimiento reducido no se pinta progresivo: solo el texto final.
+        onText: (d) => {
+          if (!reduced) setStream((cur) => (cur ?? '') + d);
+        },
+        onDone: (full) => {
+          busyRef.current = false;
+          setStream(null);
+          const text = full.trim();
+          if (text) print(...text.split(String.fromCharCode(10)).map((l) => mk(l.trim() || String.fromCharCode(160), 'ai')));
+          else print(mk(notFound()), mk(NO_AI));
+        },
+        onError: () => {
+          busyRef.current = false;
+          setStream(null);
+          print(mk(notFound()), mk(NO_AI));
+        },
+      });
+    }
+    return bridgeRef.current;
+  }, [print]);
+
+  const askAi = useCallback(
+    (prompt: string) => {
+      if (busyRef.current) return; // rate-limit: un turno a la vez
+      if (!terminalAiAvailable) {
+        print(mk(notFound()), mk(NO_AI));
+        return;
+      }
+      busyRef.current = true;
+      setStream('');
+      void getBridge().send(prompt);
+    },
+    [getBridge, print],
+  );
 
   const run = useCallback(
     (raw: string, echo: boolean) => {
@@ -107,14 +171,14 @@ export function AboutTerminal() {
         return;
       }
       if (key === 'contacto') scrollToId('contacto');
-      const out = CMDS[key]?.() ?? [
-        <>
-          comando no encontrado — error 404, prueba <Hi>help</Hi>
-        </>,
-      ];
-      print(...out.map((n) => mk(n)));
+      const known = CMDS[key];
+      if (!known) {
+        askAi(cmd);
+        return;
+      }
+      print(...known().map((n) => mk(n)));
     },
-    [print],
+    [print, askAi],
   );
 
   // Intro: sesión escrita sola, arranca al entrar en pantalla.
@@ -200,6 +264,18 @@ export function AboutTerminal() {
               {PS}
               <span className="cmd">{typing}</span>
               <span className="at-caret" />
+            </div>
+          )}
+          {stream !== null && (
+            <div className="ln ai">
+              {stream === '' ? (
+                <span className="at-think">pensando<span className="at-caret" /></span>
+              ) : (
+                <>
+                  {stream}
+                  <span className="at-caret" />
+                </>
+              )}
             </div>
           )}
           <div className="at-line">
