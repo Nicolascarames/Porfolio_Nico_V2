@@ -14,7 +14,46 @@ function asText(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function header(req: VercelRequest, name: string): string {
+  const value = req.headers?.[name];
+  return (Array.isArray(value) ? value[0] : value) ?? '';
+}
+
+// Orígenes externos autorizados (p. ej. Desktop_Nav), separados por comas.
+function allowedOrigins(): string[] {
+  return (process.env.CONTACT_ALLOWED_ORIGINS ?? '')
+    .split(',')
+    .map((o) => o.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS: sin Origin o con el propio host es same-origin y no necesita cabeceras.
+  const origin = header(req, 'origin');
+  if (origin) {
+    let sameOrigin = false;
+    try {
+      sameOrigin = new URL(origin).host === header(req, 'host');
+    } catch {
+      /* Origin malformado: se trata como cross-origin no permitido */
+    }
+    if (!sameOrigin) {
+      if (!allowedOrigins().includes(origin)) {
+        res.status(403).json({ error: 'Forbidden' });
+        return;
+      }
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'content-type');
+        res.setHeader('Access-Control-Max-Age', '86400');
+        res.status(204).end();
+        return;
+      }
+    }
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
